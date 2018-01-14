@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
-    public delegate PlayerState TransitionState(PlayerState currentState, Input input);
-    public event TransitionState TransitionHandler;
-
     // Use this for initialization
 	void Start () {
 		
@@ -19,6 +16,6 @@ public class InputManager : MonoBehaviour {
 
     public void UpdateState()
     {
-        TransitionHandler();
+        //TransitionHandler += player.mState.handleInput()
     }
 }

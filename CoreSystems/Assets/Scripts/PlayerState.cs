@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState : MonoBehaviour, IState{
+public abstract class PlayerState :  IState {
+
+    protected Player parent;
 
 	// Use this for initialization
 	void Start () {
@@ -14,8 +16,10 @@ public class PlayerState : MonoBehaviour, IState{
 		
 	}
 
-    public virtual void handleInput()
-    {
+    public abstract PlayerState HandleTransitions();
 
-    }
+    public abstract void Tick();
+
+    public abstract void OnStateEnter();
+    public abstract void OnStateExit();
 }

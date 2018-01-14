@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpState : PlayerState{
+public class JumpState {
 
 	// Use this for initialization
 	void Start () {

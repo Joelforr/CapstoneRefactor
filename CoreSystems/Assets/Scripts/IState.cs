@@ -4,7 +4,9 @@ using UnityEngine;
 
 public interface IState  {
 
-    void handleInput();
-    //void update();
+    PlayerState HandleTransitions();
+    void Tick();
+    void OnStateEnter();
+    void OnStateExit();
 
 }
