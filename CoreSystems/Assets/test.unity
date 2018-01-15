@@ -176,6 +176,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -231,8 +232,6 @@ MonoBehaviour:
   envLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  moveSpd: 0
-  maxMoveSpd: 0
   analogVector: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   gravity: 0
@@ -496,7 +495,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1940576831}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2635beb2336f2c4bbc2ec76910c769c, type: 3}
   m_Name: 
@@ -525,16 +524,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontal_speed_max: 10
   horizontal_acceleration: 5
-  horizontal_drag: 0
+  horizontal_drag: 7
   jump_height_max: 5
   jump_height_min: 2
-  initial_distance_to_peak: 0
+  initial_distance_to_peak: 7.3
   final_distance_to_peak: 0
   envLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  moveSpd: 0
-  maxMoveSpd: 0
   analogVector: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   gravity: -0.1

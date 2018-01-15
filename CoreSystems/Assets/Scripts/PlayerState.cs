@@ -6,15 +6,6 @@ public abstract class PlayerState :  IState {
 
     protected Player parent;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public abstract PlayerState HandleTransitions();
 

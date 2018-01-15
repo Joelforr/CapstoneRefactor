@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Xeo;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
@@ -15,15 +16,14 @@ public class Player : MonoBehaviour {
     public float final_distance_to_peak;
 
     public LayerMask envLayerMask;
-
-    public float moveSpd;
-    public float maxMoveSpd;
     
     public Vector2 analogVector;
     public PlayerState mState;
+    private PlayerState previousState;
 
     private Rigidbody2D _rigidbody2D;
     private BoxCollider2D _physicsCollider;
+
     public Vector2 _velocity;
     public float gravity;
 
@@ -33,7 +33,10 @@ public class Player : MonoBehaviour {
     void Start () {
         _rigidbody2D = this.GetComponent<Rigidbody2D>();
         _physicsCollider = this.GetComponent<BoxCollider2D>();
+
         mState = new IdleState(this);
+
+        gravity = Physf.CalculateGravity(jump_height_max, initial_distance_to_peak, horizontal_speed_max);
 	}
 	
 	// Update is called once per frame
@@ -44,8 +47,15 @@ public class Player : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        Debug.Log(mState.GetType());
         mState.Tick();
         UpdatePosition();
+    }
+
+    private void UpdateState()
+    {
+        previousState = mState;
+        mState = mState.HandleTransitions();
     }
 
     private void UpdatePosition()
@@ -65,25 +75,6 @@ public class Player : MonoBehaviour {
         //Ground Check
         if (Physics2D.OverlapArea(bl, br, envLayerMask) != null);
 
-    }
-
-    public float CalculateGravity(float jump_height, float lateral_distance, float x_velocity)
-    {
-        float gravity;
-
-        gravity = -2 * jump_height * (x_velocity * x_velocity) / ((lateral_distance / 2) * (lateral_distance / 2));
-
-        return gravity;
-
-    }
-
-    public float CalculateJumpVelocity(float jump_height, float lateral_distance, float x_velocity)
-    {
-        float y_velocity;
-
-        y_velocity = (2 * jump_height * x_velocity) / (lateral_distance / 2);
-
-        return y_velocity;
     }
 
   
