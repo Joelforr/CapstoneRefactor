@@ -15,14 +15,14 @@ public class Player : MonoBehaviour {
     public float initial_distance_to_peak;
     public float final_distance_to_peak;
 
-    public LayerMask envLayerMask;
+    public LayerMask _collisionMask;
     
     public Vector2 analogVector;
     public PlayerState mState;
     private PlayerState previousState;
 
-    private Rigidbody2D _rigidbody2D;
-    private BoxCollider2D _physicsCollider;
+    private Rigidbody2D _rigidbody2D; 
+    public BoxCollider2D _physicsCollider { get; private set; }
 
     public Vector2 _velocity;
     public float gravity;
@@ -36,7 +36,7 @@ public class Player : MonoBehaviour {
 
         mState = new IdleState(this);
 
-        gravity = Physf.CalculateGravity(jump_height_max, initial_distance_to_peak, horizontal_speed_max);
+        gravity = PhysX.CalculateGravity(jump_height_max, initial_distance_to_peak, horizontal_speed_max);
 	}
 	
 	// Update is called once per frame
@@ -65,18 +65,5 @@ public class Player : MonoBehaviour {
                          _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime));
     }
 
-    private void SetGrounded()
-    {
-        //Bottom Left
-        Vector2 bl = transform.TransformPoint(_physicsCollider.offset + new Vector2(-_physicsCollider.size.x / 2, -_physicsCollider.size.y / 2));
-        //Bottom Right
-        Vector2 br = transform.TransformPoint(_physicsCollider.offset + new Vector2(_physicsCollider.size.x / 2, -_physicsCollider.size.y / 2));
-
-        //Ground Check
-        if (Physics2D.OverlapArea(bl, br, envLayerMask) != null);
-
-    }
-
-  
 
 }

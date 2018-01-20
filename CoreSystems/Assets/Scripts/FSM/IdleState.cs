@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Xeo;
 
 public class IdleState : PlayerState {
 
@@ -12,7 +13,10 @@ public class IdleState : PlayerState {
 
     public override PlayerState HandleTransitions()
     {
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        if(!Collisions.IsGrounded(parent.transform, parent._physicsCollider, parent._collisionMask)){
+            return new FallState(parent);
+        }
+        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
         {
             //OnStateExit();
             return new WalkState(parent);

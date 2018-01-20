@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FallState : PlayerState
-{
+public class WalkState : PlayerState {
 
-    public FallState(Player parent)
+    public WalkState(Player parent)
     {
         this.parent = parent;
-        OnStateEnter();
+        //OnStateEnter();
     }
 
     public override PlayerState HandleTransitions()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (parent._velocity.x == 0)
+        {
+            OnStateExit();
+            return new IdleState(parent);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             return new JumpState(parent);
         }
@@ -25,18 +29,16 @@ public class FallState : PlayerState
 
     public override void OnStateEnter()
     {
-       
+        throw new System.NotImplementedException();
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public override void Tick()
     {
-        parent._velocity.y += parent.gravity * Time.deltaTime;
-
         if (Mathf.Abs(Input.GetAxis("Horizontal")) > .2f)
         {
             parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
@@ -46,15 +48,6 @@ public class FallState : PlayerState
         {
             parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
         }
+       
     }
-
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

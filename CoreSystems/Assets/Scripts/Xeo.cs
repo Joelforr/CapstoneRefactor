@@ -3,6 +3,21 @@ using UnityEngine;
 
 namespace Xeo
 {
+    public class Collisions
+    {
+        public static bool IsGrounded(Transform _transform, BoxCollider2D _physicsCollider, LayerMask _collisionMask)
+        {
+            //Bottom Left
+            Vector2 bl = _transform.TransformPoint(_physicsCollider.offset + new Vector2(-_physicsCollider.size.x / 2, -_physicsCollider.size.y / 2));
+            //Bottom Right
+            Vector2 br = _transform.TransformPoint(_physicsCollider.offset + new Vector2(_physicsCollider.size.x / 2, -_physicsCollider.size.y / 2));
+
+            //Ground Check
+            return Physics2D.OverlapArea(bl, br, _collisionMask) != null;
+
+        }
+    }
+
    /* public class Input
     {
 
@@ -41,7 +56,7 @@ namespace Xeo
         }
     }
 
-    public class Physf
+    public class PhysX
     {
         public static float CalculateGravity(float jump_height, float lateral_distance, float x_velocity)
         {

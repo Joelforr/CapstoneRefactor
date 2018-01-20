@@ -15,7 +15,11 @@ public class JumpState: PlayerState {
     {
         if(parent._velocity.y < 0)
         {
-            return new FallState(this.parent);
+            return new FallState(parent);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            return new JumpState(parent);
         }
         else
         {
@@ -25,7 +29,8 @@ public class JumpState: PlayerState {
 
     public override void OnStateEnter()
     {
-        parent._velocity.y = Physf.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
+        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
+        parent._velocity.y = PhysX.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
     }
 
     public override void OnStateExit()

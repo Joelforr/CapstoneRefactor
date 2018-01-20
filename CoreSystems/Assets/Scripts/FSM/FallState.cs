@@ -1,21 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Xeo;
 
-public class WalkState : PlayerState {
+public class FallState : PlayerState
+{
 
-    public WalkState(Player parent)
+    public FallState(Player parent)
     {
         this.parent = parent;
-        //OnStateEnter();
+        OnStateEnter();
     }
 
     public override PlayerState HandleTransitions()
     {
-        if (parent._velocity.x == 0)
+        if(Collisions.IsGrounded(parent.transform, parent._physicsCollider, parent._collisionMask))
         {
-            OnStateExit();
             return new IdleState(parent);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            return new JumpState(parent);
         }
         else
         {
@@ -25,16 +30,18 @@ public class WalkState : PlayerState {
 
     public override void OnStateEnter()
     {
-        throw new System.NotImplementedException();
+        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.final_distance_to_peak, parent.horizontal_speed_max);
     }
 
     public override void OnStateExit()
     {
-        Debug.Log("LEAVING");
+        throw new System.NotImplementedException();
     }
 
     public override void Tick()
     {
+        parent._velocity.y += parent.gravity * Time.deltaTime;
+
         if (Mathf.Abs(Input.GetAxis("Horizontal")) > .2f)
         {
             parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
@@ -44,6 +51,7 @@ public class WalkState : PlayerState {
         {
             parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
         }
-       
     }
+
+   
 }
