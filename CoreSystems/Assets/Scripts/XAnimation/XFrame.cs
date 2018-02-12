@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class XFrame : ScriptableObject
 {
-
     public Sprite sprite;
-    public int frameLength;
+    public int lifetime;
     public List<Group> groups;
+    public Rect box_dimensions;
 }
 
 [System.Serializable]
@@ -21,7 +21,6 @@ public class Group
     }
 
     public GroupName name;
-
     //private string name;
     public List<HitboxProperties> boxes;
 }
@@ -34,5 +33,5 @@ public class LayerProperties
 [System.Serializable]
 public class HitboxProperties
 {
-    public Vector4 rect;
+    public Rect hitboxDimensions;
 }

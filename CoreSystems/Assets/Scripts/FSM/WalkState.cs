@@ -39,7 +39,7 @@ public class WalkState : PlayerState {
 
     public override void Tick()
     {
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > .2f)
+        if (Mathf.Abs(Input.GetAxis("Horizontal")) > .5f)       //.5f deadzone
         {
             parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
             parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);

@@ -11,21 +11,29 @@ public class Player : MonoBehaviour {
     public float horizontal_acceleration;
     public float horizontal_drag;
     public float jump_height_max;
-    public float jump_height_min;
+    public float short_jump_height;
     public float initial_distance_to_peak;
     public float final_distance_to_peak;
+    public float air_drag;
 
     public LayerMask _collisionMask;
     
     public Vector2 analogVector;
     public PlayerState mState;
-    private PlayerState previousState;
+    public PlayerState previousState { get; private set;}
 
     private Rigidbody2D _rigidbody2D; 
     public BoxCollider2D _physicsCollider { get; private set; }
 
     public Vector2 _velocity;
+    private Vector2 _integratedVelocity;
     public float gravity;
+
+    public float Fl;
+    public float Fr;
+    public float theta;
+
+    public float ad, kg, vp, bk, la;
 
     private const float NEAR_ZERO = .0001f;
 
@@ -42,14 +50,17 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         mState = mState.HandleTransitions();
-
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            mState = new HurtState(this, ad, kg, vp, bk, la);
+        }
 	}
 
     private void FixedUpdate()
     {
-        Debug.Log(mState.GetType());
         mState.Tick();
         UpdatePosition();
+        Debug.Log(mState);
     }
 
     private void UpdateState()
@@ -60,9 +71,13 @@ public class Player : MonoBehaviour {
 
     private void UpdatePosition()
     {
+        //_integratedVelocity.x = _velocity.x * Time.deltaTime + horizontal_acceleration / 2 * Time.deltaTime * Time.deltaTime;
+        //_integratedVelocity.y = _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime;
+        //Debug.Log(_integratedVelocity);
+
         _rigidbody2D.MovePosition((Vector2)transform.position +
             new Vector2(_velocity.x * Time.deltaTime + horizontal_acceleration / 2 * Time.deltaTime * Time.deltaTime,
-                         _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime));
+                        _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime));
     }
 
 

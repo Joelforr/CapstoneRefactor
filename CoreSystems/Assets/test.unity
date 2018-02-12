@@ -226,7 +226,7 @@ MonoBehaviour:
   horizontal_acceleration: 0
   horizontal_drag: 0
   jump_height_max: 0
-  jump_height_min: 0
+  short_jump_height: 0
   initial_distance_to_peak: 0
   final_distance_to_peak: 0
   _collisionMask:
@@ -235,6 +235,9 @@ MonoBehaviour:
   analogVector: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   gravity: 0
+  Fl: 0
+  Fr: 0
+  theta: 0
 --- !u!4 &568376335
 Transform:
   m_ObjectHideFlags: 0
@@ -277,42 +280,30 @@ GameObject:
   m_Component:
   - component: {fileID: 792598624}
   - component: {fileID: 792598623}
+  - component: {fileID: 792598625}
   m_Layer: 0
   m_Name: AnimationDummy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &792598623
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 792598622}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fa2ccc9d3b770b4489d25c5b2aac87a, type: 3}
+  m_Script: {fileID: 11500000, guid: 400e8518395ce664cb786d8b9831890b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animationFramesPerSecond: 15
-  animationList:
-  - animationName: 
-    frames:
-    - frameSprite: {fileID: 0}
-      HitBoxes: []
-      HurtBoxes: []
-    - frameSprite: {fileID: 0}
-      HitBoxes: []
-      HurtBoxes: []
-  hitBoxColor: {r: 0, g: 1, b: 0, a: 1}
-  hurtBoxColor: {r: 1, g: 0, b: 0, a: 1}
-  pixelsPerUnit: 0
-  currentAnimation:
-    animationName: 
-    frames: []
-  hasHurtBoxThisFrame: 1
-  hasHitBoxThisFrame: 1
+  fps: 60
+  xAnim: {fileID: 11400000, guid: 7452a8040757b4b4db13e24e1d094a9b, type: 2}
+  current_frame: 0
+  frame_current_time: 0
+  frame_end_time: 0
 --- !u!4 &792598624
 Transform:
   m_ObjectHideFlags: 0
@@ -326,6 +317,50 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &792598625
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 792598622}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
 --- !u!1 &1219087225
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +473,6 @@ GameObject:
   - component: {fileID: 1940576832}
   - component: {fileID: 1940576836}
   - component: {fileID: 1940576837}
-  - component: {fileID: 1940576838}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -585,7 +619,7 @@ MonoBehaviour:
   horizontal_acceleration: 5
   horizontal_drag: 7
   jump_height_max: 5
-  jump_height_min: 2
+  short_jump_height: 0
   initial_distance_to_peak: 7.3
   final_distance_to_peak: 7.3
   _collisionMask:
@@ -594,24 +628,6 @@ MonoBehaviour:
   analogVector: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   gravity: -0.1
---- !u!111 &1940576838
-Animation:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1940576831}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
+  Fl: 60
+  Fr: 80
+  theta: 30

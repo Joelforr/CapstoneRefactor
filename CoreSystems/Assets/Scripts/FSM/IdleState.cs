@@ -33,7 +33,7 @@ public class IdleState : PlayerState {
 
     public override void OnStateEnter()
     {
-        if (parent._velocity != Vector2.zero) parent._velocity = Vector2.zero;
+        //if (parent._velocity != Vector2.zero) parent._velocity = Vector2.zero;
     }
 
     public override void OnStateExit()

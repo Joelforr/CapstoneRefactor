@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Xeo;
 
 public class XAnimationEditor : EditorWindow {
 
     public XAnimation xAnimation;
+
+    private XAnimation xAnimation_obj;
+    private List<XFrame> child_frames;
+    private XFrame current_xframe;
+
+
     private int viewIndex = 1;
 
     private Rect leftPanel;
@@ -14,13 +21,24 @@ public class XAnimationEditor : EditorWindow {
 
     private float sizeRatio;
     private bool isResizing;
-
     private GUIStyle resizerStyle;
 
-    [MenuItem("Window/Custom/XAnimation Editor %#e")]
+    private GUIStyle foldoutStyle;
+    private bool show_properties;
+    private bool show_physbox;
+    private bool show_hitbox;
+    private bool show_hurtbox;
+
+
+ [MenuItem("Window/Custom/XAnimation Editor %#e")]
     static void Init()
     {
         EditorWindow.GetWindow(typeof(XAnimationEditor));
+    }
+
+    public XAnimationEditor()
+    {
+        child_frames = new List<XFrame>();
     }
 
     private void OnEnable()
@@ -34,6 +52,33 @@ public class XAnimationEditor : EditorWindow {
         sizeRatio = 0.3f;
         resizerStyle = new GUIStyle();
         resizerStyle.normal.background = EditorGUIUtility.Load("icons/d_AvatarBlendBackground.png") as Texture2D;
+
+        foldoutStyle = new GUIStyle();
+        foldoutStyle.normal.background = EditorGUIUtility.Load("icons/d_AvatarBlendBackground.png") as Texture2D;
+
+    }
+
+    private void OnSelectionChange()
+    {
+        if(Selection.objects.Length > 1)
+        {
+
+        }
+        else if(Selection.activeObject is XAnimation)
+        {
+            child_frames.Clear();
+            xAnimation_obj = (XAnimation)Selection.activeObject;
+            foreach(XFrame frame in xAnimation_obj.frames)
+            {
+                child_frames.Add(frame);
+            }
+        }
+        else
+        {
+            child_frames.Clear();
+        }
+
+        this.Repaint();
     }
 
     private void OnGUI()
@@ -50,7 +95,17 @@ public class XAnimationEditor : EditorWindow {
     {
         leftPanel = new Rect(0, 0, position.width * sizeRatio, position.height);
         GUILayout.BeginArea(leftPanel);
-        GUILayout.Label("LeftPanel");
+
+        if (xAnimation_obj != null)
+        {
+            GUILayout.Label("LeftPanel", EditorStyles.boldLabel);
+            show_properties = EditorGUILayout.Foldout(show_properties, "Properties");
+            if (show_properties)
+            {
+                EditorGUILayout.TextField("Current Animation:", xAnimation_obj.name);
+            }
+            show_physbox = EditorGUILayout.Foldout(show_physbox, "Physics Collider");
+        }
         GUILayout.EndArea();
     }
 
@@ -60,6 +115,8 @@ public class XAnimationEditor : EditorWindow {
         GUILayout.BeginArea(rightPanel);
         GUILayout.Label("RightPanel");
         GUILayout.EndArea();
+        DrawOnGUISprite(child_frames[0].sprite);
+        //GUI.DrawTextureWithTexCoords(new Rect(0,0,64,64), Xeo.Utility.textureFromSprite(child_frames[0].sprite), Xeo.Utility.textureFromSprite(child_frames[0].sprite).r);
     }
 
     private void DrawResizer()
@@ -97,6 +154,23 @@ public class XAnimationEditor : EditorWindow {
             sizeRatio = e.mousePosition.x / position.width;
             sizeRatio = Mathf.Clamp(sizeRatio, .3f, .6f);
             Repaint();
+        }
+    }
+
+    void DrawOnGUISprite(Sprite aSprite)
+    {
+        Rect c = aSprite.rect;
+        float spriteW = c.width;
+        float spriteH = c.height;
+        Rect rect = GUILayoutUtility.GetRect(spriteW, spriteH);
+        if (Event.current.type == EventType.Repaint)
+        {
+            var tex = Xeo.Utility.textureFromSprite(aSprite);
+            c.xMin /= tex.width;
+            c.xMax /= tex.width;
+            c.yMin /= tex.height;
+            c.yMax /= tex.height;
+            GUI.DrawTextureWithTexCoords(rect, tex, c);
         }
     }
 }

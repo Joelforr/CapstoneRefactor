@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class CreateXFrame : MonoBehaviour {
+public class CreateXFrame  {
+    private static int count = 0;
 
     [MenuItem("Assets/Create/Custom/XFrame")]
     public static XFrame Create()
@@ -18,8 +19,9 @@ public class CreateXFrame : MonoBehaviour {
         }
             
 
-        AssetDatabase.CreateAsset(asset, "Assets/Data/XFrameData/XFrame.asset");
+        AssetDatabase.CreateAsset(asset, "Assets/Data/XFrameData/XFrame" + count + ".asset");
         AssetDatabase.SaveAssets();
+        count++;
         return asset;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FrameAnimateTest : MonoBehaviour {
 
-
+    /*
     public int animationFramesPerSecond = 15;
     public Animations[] animationList;
 
@@ -183,4 +183,5 @@ public class FrameAnimateTest : MonoBehaviour {
 
 
     //end
+    */
 }

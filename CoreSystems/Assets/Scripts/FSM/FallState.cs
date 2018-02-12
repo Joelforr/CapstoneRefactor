@@ -49,7 +49,7 @@ public class FallState : PlayerState
         }
         else
         {
-            parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
+            parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
         }
     }
 

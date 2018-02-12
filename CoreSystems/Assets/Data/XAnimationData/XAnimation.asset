@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87a447074dc09a4aa27d34b81d717b8, type: 3}
+  m_Name: XAnimation
+  m_EditorClassIdentifier: 
+  fps: 60
+  loop: 0
+  exitOnComplete: 0
+  frames:
+  - {fileID: 11400000, guid: 79d3fa1620d86174fbaca48948f29556, type: 2}
+  - {fileID: 11400000, guid: 3938116a5888edc41bed6dacca669551, type: 2}
+  - {fileID: 11400000, guid: 51f3605aacdce1044b80de02346ff348, type: 2}
+  - {fileID: 11400000, guid: 9e9a9a4275ff18745a88b45c854c0d10, type: 2}
+  - {fileID: 11400000, guid: 452035c0aae7cb342a8ce26993985b50, type: 2}
+  - {fileID: 11400000, guid: b3c2cfd51339a2d4a892ca9831bfa424, type: 2}
+  - {fileID: 11400000, guid: afb4f31c997bf4948b62dce2be2b9c80, type: 2}
+  - {fileID: 11400000, guid: 33a525e0e0c3ff845a4fdec6e90d8ac9, type: 2}
