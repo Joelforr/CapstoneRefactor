@@ -12,6 +12,11 @@ public class FallState : PlayerState
         OnStateEnter();
     }
 
+    public override void AnimationTransitionEvent()
+    {
+     
+    }
+
     public override PlayerState HandleTransitions()
     {
         if(Collisions.IsGrounded(parent.transform, parent._physicsCollider, parent._collisionMask))
@@ -42,9 +47,9 @@ public class FallState : PlayerState
     {
         parent._velocity.y += parent.gravity * Time.deltaTime;
 
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > .2f)
+        if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
         {
-            parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
+            parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
             parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
         }
         else

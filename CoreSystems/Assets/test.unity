@@ -229,15 +229,22 @@ MonoBehaviour:
   short_jump_height: 0
   initial_distance_to_peak: 0
   final_distance_to_peak: 0
+  air_drag: 0
   _collisionMask:
     serializedVersion: 2
     m_Bits: 0
   analogVector: {x: 0, y: 0}
+  _xAnimator: {fileID: 0}
   _velocity: {x: 0, y: 0}
   gravity: 0
   Fl: 0
   Fr: 0
   theta: 0
+  ad: 0
+  kg: 0
+  vp: 0
+  bk: 0
+  la: 0
 --- !u!4 &568376335
 Transform:
   m_ObjectHideFlags: 0
@@ -287,7 +294,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &792598623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,6 +480,7 @@ GameObject:
   - component: {fileID: 1940576832}
   - component: {fileID: 1940576836}
   - component: {fileID: 1940576837}
+  - component: {fileID: 1940576838}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -622,12 +630,35 @@ MonoBehaviour:
   short_jump_height: 0
   initial_distance_to_peak: 7.3
   final_distance_to_peak: 7.3
+  air_drag: 0.7
   _collisionMask:
     serializedVersion: 2
     m_Bits: 256
   analogVector: {x: 0, y: 0}
+  _xAnimator: {fileID: 0}
   _velocity: {x: 0, y: 0}
   gravity: -0.1
   Fl: 60
-  Fr: 80
-  theta: 30
+  Fr: 40
+  theta: 45
+  ad: 7
+  kg: 1.6
+  vp: 0
+  bk: 5
+  la: 30
+--- !u!114 &1940576838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1940576831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400e8518395ce664cb786d8b9831890b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fps: 60
+  xAnim: {fileID: 11400000, guid: aed396bd8f3d4894ab0a4f8db8003a90, type: 2}
+  current_frame: 0
+  frame_current_time: 0
+  frame_end_time: 0

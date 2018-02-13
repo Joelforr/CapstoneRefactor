@@ -11,14 +11,21 @@ public class CreateXAnimation {
     {
         XAnimation asset = ScriptableObject.CreateInstance<XAnimation>();
 
-        if (!AssetDatabase.IsValidFolder("Assets/Data"))
-            AssetDatabase.CreateFolder("Assets", "Data");
-
-        if (!AssetDatabase.IsValidFolder("Assets/Data/XAnimationData")){
-            AssetDatabase.CreateFolder("Assets/Data", "XAnimationData");
+        if (!AssetDatabase.IsValidFolder("Assets/Resources"))
+        {
+            AssetDatabase.CreateFolder("Assets", "Resources");
         }
 
-        AssetDatabase.CreateAsset(asset, "Assets/Data/XAnimationData/XAnimation" + count + ".asset");
+        if (!AssetDatabase.IsValidFolder("Assets/Resources/Data"))
+        {
+            AssetDatabase.CreateFolder("Assets/Resources", "Data");
+        }
+
+        if (!AssetDatabase.IsValidFolder("Assets/Resources/Data/XAnimationData")){
+            AssetDatabase.CreateFolder("Assets/Resources/Data", "XAnimationData");
+        }
+
+        AssetDatabase.CreateAsset(asset, "Assets/Resources/Data/XAnimationData/XAnimation" + count + ".asset");
         AssetDatabase.SaveAssets();
 
         EditorUtility.FocusProjectWindow();

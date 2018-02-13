@@ -11,15 +11,22 @@ public class CreateXFrame  {
     {
         XFrame asset = ScriptableObject.CreateInstance<XFrame>();
 
-        if (!AssetDatabase.IsValidFolder("Assets/Data"))
-            AssetDatabase.CreateFolder("Assets", "Data");
+        if (!AssetDatabase.IsValidFolder("Assets/Resources"))
+        {
+            AssetDatabase.CreateFolder("Assets", "Resources");
+        }
 
-        if (!AssetDatabase.IsValidFolder("Assets/Data/XFrameData")) {
-            AssetDatabase.CreateFolder("Assets/Data", "XFrameData");
+        if (!AssetDatabase.IsValidFolder("Assets/Resources/Data"))
+        {
+            AssetDatabase.CreateFolder("Assets/Resources", "Data");
+        }
+
+        if (!AssetDatabase.IsValidFolder("Assets/Resources/Data/XFrameData")) {
+            AssetDatabase.CreateFolder("Assets/Resources/Data", "XFrameData");
         }
             
 
-        AssetDatabase.CreateAsset(asset, "Assets/Data/XFrameData/XFrame" + count + ".asset");
+        AssetDatabase.CreateAsset(asset, "Assets/Resources/Data/XFrameData/XFrame" + count + ".asset");
         AssetDatabase.SaveAssets();
         count++;
         return asset;

@@ -9,10 +9,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c87a447074dc09a4aa27d34b81d717b8, type: 3}
-  m_Name: XAnimation
+  m_Name: Run_XAnimation
   m_EditorClassIdentifier: 
   fps: 60
-  loop: 0
+  loop: 1
   exitOnComplete: 0
   frames:
   - {fileID: 11400000, guid: 79d3fa1620d86174fbaca48948f29556, type: 2}

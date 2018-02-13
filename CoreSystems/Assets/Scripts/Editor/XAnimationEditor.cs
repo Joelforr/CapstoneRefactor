@@ -105,6 +105,7 @@ public class XAnimationEditor : EditorWindow {
                 EditorGUILayout.TextField("Current Animation:", xAnimation_obj.name);
             }
             show_physbox = EditorGUILayout.Foldout(show_physbox, "Physics Collider");
+
         }
         GUILayout.EndArea();
     }

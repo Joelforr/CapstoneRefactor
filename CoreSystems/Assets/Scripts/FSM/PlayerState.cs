@@ -13,4 +13,5 @@ public abstract class PlayerState :  IState {
 
     public abstract void OnStateEnter();
     public abstract void OnStateExit();
+    public abstract void AnimationTransitionEvent();
 }

@@ -9,8 +9,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab2f221657098054a97dc77e9ffd5683, type: 3}
-  m_Name: XFrame6
+  m_Name: Run_1
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 7452aa56061e19f4d81b6124c889779d, type: 3}
+  sprite: {fileID: 21300000, guid: 8662fda9e761a5043a2f0d77ee3b6806, type: 3}
   lifetime: 3
   groups: []
+  box_dimensions:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0

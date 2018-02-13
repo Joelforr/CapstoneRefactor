@@ -46,6 +46,11 @@ public class HurtState : PlayerState{
         OnStateEnter();
     }
 
+    public override void AnimationTransitionEvent()
+    {
+
+    }
+
     public override PlayerState HandleTransitions()
     {
         if(stun_duration < 0)

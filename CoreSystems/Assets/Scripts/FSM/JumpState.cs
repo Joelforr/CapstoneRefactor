@@ -11,6 +11,11 @@ public class JumpState: PlayerState {
         OnStateEnter();
     }
 
+    public override void AnimationTransitionEvent()
+    {
+        
+    }
+
     public override PlayerState HandleTransitions()
     {
         if(parent._velocity.y < 0)
@@ -42,9 +47,9 @@ public class JumpState: PlayerState {
     {
         parent._velocity.y += parent.gravity * Time.deltaTime;
 
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > .2f)
+        if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
         {
-            parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
+            parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
             parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
         }
         else

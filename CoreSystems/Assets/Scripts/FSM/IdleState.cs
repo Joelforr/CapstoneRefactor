@@ -11,6 +11,11 @@ public class IdleState : PlayerState {
         OnStateEnter();
     }
 
+    public override void AnimationTransitionEvent()
+    {
+
+    }
+
     public override PlayerState HandleTransitions()
     {
         if(!Collisions.IsGrounded(parent.transform, parent._physicsCollider, parent._collisionMask)){
@@ -33,7 +38,9 @@ public class IdleState : PlayerState {
 
     public override void OnStateEnter()
     {
+        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Idle_XAnimation") as XAnimation);
         //if (parent._velocity != Vector2.zero) parent._velocity = Vector2.zero;
+        
     }
 
     public override void OnStateExit()

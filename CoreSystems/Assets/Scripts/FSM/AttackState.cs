@@ -26,6 +26,11 @@ public class AttackState : PlayerState {
         OnStateEnter();
     }
 
+    public override void AnimationTransitionEvent()
+    {
+
+    }
+
     public override PlayerState HandleTransitions()
     {
         return this;

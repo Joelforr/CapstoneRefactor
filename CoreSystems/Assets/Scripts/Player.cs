@@ -17,13 +17,16 @@ public class Player : MonoBehaviour {
     public float air_drag;
 
     public LayerMask _collisionMask;
-    
-    public Vector2 analogVector;
+
+    public Vector2 normalized_directional_input;
+    public float facing_direction;
+
     public PlayerState mState;
     public PlayerState previousState { get; private set;}
 
     private Rigidbody2D _rigidbody2D; 
     public BoxCollider2D _physicsCollider { get; private set; }
+    public XAnimator _xAnimator;
 
     public Vector2 _velocity;
     private Vector2 _integratedVelocity;
@@ -41,6 +44,7 @@ public class Player : MonoBehaviour {
     void Start () {
         _rigidbody2D = this.GetComponent<Rigidbody2D>();
         _physicsCollider = this.GetComponent<BoxCollider2D>();
+        _xAnimator = this.GetComponent<XAnimator>();
 
         mState = new IdleState(this);
 
@@ -49,6 +53,7 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        UpdateDirectionalInformation();
         mState = mState.HandleTransitions();
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -61,6 +66,18 @@ public class Player : MonoBehaviour {
         mState.Tick();
         UpdatePosition();
         Debug.Log(mState);
+    }
+
+    private void UpdateDirectionalInformation()
+    {
+        this.normalized_directional_input = Vector2.zero;
+        if (Input.GetKey(KeyCode.RightArrow)) normalized_directional_input.x += 1;
+        if (Input.GetKey(KeyCode.LeftArrow)) normalized_directional_input.x -= 1;
+        if (Input.GetKey(KeyCode.UpArrow)) normalized_directional_input.y += 1;
+        if (Input.GetKey(KeyCode.DownArrow)) normalized_directional_input.y -= 1;
+
+        if (normalized_directional_input.x != 0) facing_direction = normalized_directional_input.x;
+
     }
 
     private void UpdateState()

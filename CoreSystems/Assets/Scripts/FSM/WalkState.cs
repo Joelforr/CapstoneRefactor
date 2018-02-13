@@ -7,12 +7,17 @@ public class WalkState : PlayerState {
     public WalkState(Player parent)
     {
         this.parent = parent;
-        //OnStateEnter();
+        OnStateEnter();
+    }
+
+    public override void AnimationTransitionEvent()
+    {
+
     }
 
     public override PlayerState HandleTransitions()
     {
-        if (parent._velocity.x == 0)
+        if (parent._velocity.x == 0 && Mathf.Abs(parent.normalized_directional_input.x) < 0.1f)
         {
             OnStateExit();
             return new IdleState(parent);
@@ -29,7 +34,8 @@ public class WalkState : PlayerState {
 
     public override void OnStateEnter()
     {
-        throw new System.NotImplementedException();
+        parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
+        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Run_XAnimation") as XAnimation);
     }
 
     public override void OnStateExit()
@@ -39,9 +45,9 @@ public class WalkState : PlayerState {
 
     public override void Tick()
     {
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > .5f)       //.5f deadzone
+        if (Mathf.Abs(parent.normalized_directional_input.x) > .5f)       //.5f deadzone
         {
-            parent._velocity.x += Input.GetAxis("Horizontal") * parent.horizontal_acceleration;
+            parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
             parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
         }
         else

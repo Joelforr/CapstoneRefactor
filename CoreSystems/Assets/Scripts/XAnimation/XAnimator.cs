@@ -52,14 +52,52 @@ public class XAnimator : MonoBehaviour {
         KeyframeTranstion();
         frameRenderer.sprite = active_frame.sprite;
     }
-    
+
+    private void Init()
+    {
+        current_frame = 0;
+        last_keyframe = 0;
+
+        try
+        {
+            active_frame = xAnim.frames[0];
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.LogError("Missing animation reference");
+        }
+    }
+
     void KeyframeTranstion()
     {
         if(current_frame - last_keyframe > active_frame.lifetime)
         {
             last_keyframe = current_frame;
-            active_frame = xAnim.GetNextFrame(active_frame);
+
+            if (active_frame == xAnim.GetFinalFrame())
+            {
+                OnAnimationComplete();
+            }
+            else
+            {
+                active_frame = xAnim.GetNextFrame(active_frame);
+            }
         }
+    }
+
+    private void OnAnimationComplete()
+    {
+        switch (xAnim.loop)
+        {
+            case false:
+                this.gameObject.SendMessage("AnimationTransitionEvent", SendMessageOptions.DontRequireReceiver);
+                break;
+
+            default:
+                active_frame = xAnim.GetNextFrame(active_frame);
+                break;
+        }
+        
     }
 
     public void SetAnimation(XAnimation animation)
@@ -68,20 +106,6 @@ public class XAnimator : MonoBehaviour {
         last_keyframe = 0;
         xAnim = animation;
         active_frame = xAnim.frames[0];
-    }
-
-    private void Init()
-    {
-        current_frame = 0;
-        last_keyframe = 0;
-
-        try{
-            active_frame = xAnim.frames[0];
-        }
-        catch (NullReferenceException e)
-        {
-            Debug.LogError("Missing animation reference");
-        }
     }
 
 }
