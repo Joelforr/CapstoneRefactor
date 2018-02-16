@@ -30,6 +30,10 @@ public class IdleState : PlayerState {
         {
             return new JumpState(parent);
         }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            return new AttackState(parent);
+        }
         else
         {
             return this;

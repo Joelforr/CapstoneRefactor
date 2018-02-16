@@ -13,10 +13,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: 958c3de5e5a1f9644ac0779599c52068, type: 3}
   lifetime: 10
-  groups: []
-  box_dimensions:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
+  hitboxes: []
+  hurtboxes:
+  - type: 1
+    _dimensions:
+      serializedVersion: 2
+      x: 0.125
+      y: -0.25
+      width: 1.75
+      height: 3.75
+    isTrigger: 1
+    attack_damage: 0
+    knockback_growth: 0
+    base_knockback: 0
+    launch_angle: 0

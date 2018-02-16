@@ -21,6 +21,8 @@ public class XAnimator : MonoBehaviour {
     private XFrame active_frame;
     private SpriteRenderer frameRenderer;
 
+    private float facing;
+
 
     private void Start()
     {
@@ -50,6 +52,8 @@ public class XAnimator : MonoBehaviour {
         }
 
         KeyframeTranstion();
+        UpdateFacing();
+        DrawCollisionBoxes();
         frameRenderer.sprite = active_frame.sprite;
     }
 
@@ -90,7 +94,7 @@ public class XAnimator : MonoBehaviour {
         switch (xAnim.loop)
         {
             case false:
-                this.gameObject.SendMessage("AnimationTransitionEvent", SendMessageOptions.DontRequireReceiver);
+                this.gameObject.SendMessage("XAnimatorCompletetionCall", SendMessageOptions.DontRequireReceiver);
                 break;
 
             default:
@@ -106,6 +110,93 @@ public class XAnimator : MonoBehaviour {
         last_keyframe = 0;
         xAnim = animation;
         active_frame = xAnim.frames[0];
+    }
+
+    public void SetFacing(float direction_value)
+    {
+        facing = direction_value != 0 ?  direction_value : 1;
+    }
+
+    private void UpdateFacing()
+    {
+        if(Mathf.Sign(frameRenderer.transform.localScale.x) != facing)
+        {
+            frameRenderer.transform.localScale = new Vector2(-frameRenderer.transform.localScale.x, frameRenderer.transform.localScale.y);
+        }
+    }
+
+    private void DrawCollisionBoxes()
+    {
+        GameObject hurtbox_group = null;
+        GameObject hitbox_group = null;
+
+        foreach (Transform child in transform)
+        {
+            if (child.name == "Hurtbox")
+            {
+                hurtbox_group = child.gameObject;
+            }
+            if(child.name == "Hitbox")
+            {
+                hitbox_group = child.gameObject;
+            }
+        }
+
+        if (hurtbox_group == null)
+        {
+            hurtbox_group = Xeo.Utility.CreateChildObj("Hurtbox", this.transform);
+        }
+        if(hitbox_group == null)
+        {
+            hitbox_group = Xeo.Utility.CreateChildObj("Hitbox", this.transform);
+        }
+
+        ClearCollisionBoxes(hurtbox_group.transform);
+        ClearCollisionBoxes(hitbox_group.transform);
+
+        if(active_frame.hurtboxes.Count > 0)
+        {
+            for (int i = 0; i < active_frame.hurtboxes.Count; i++)
+            {
+                AddCollisionBox("Hurtbox " + i, hurtbox_group.transform, active_frame.hurtboxes[i]);
+            }
+        }
+
+        if (active_frame.hitboxes.Count > 0)
+        {
+            for (int i = 0; i < active_frame.hitboxes.Count; i++)
+            {
+                AddCollisionBox("Hitbox " + i, hitbox_group.transform, active_frame.hitboxes[i]);
+            }
+        }
+
+    }
+
+    private void AddCollisionBox(string name, Transform parent, HitboxProperties properties)
+    {
+        GameObject collision_box = Xeo.Utility.CreateChildObj(name, parent);
+        collision_box.layer = LayerMask.NameToLayer(properties.type.ToString());
+        collision_box.transform.position += new Vector3(
+            properties._dimensions.position.x * facing, 
+            properties._dimensions.position.y);
+
+        BoxCollider2D _collider = collision_box.AddComponent<BoxCollider2D>();
+        _collider.isTrigger = properties.isTrigger;
+        _collider.size = properties._dimensions.size;
+
+        if (properties.type == HitboxProperties.BoxType.Hit)
+        {
+            Hitbox.AttachHitbox(collision_box, properties);
+        }
+        
+    }
+
+    private void ClearCollisionBoxes(Transform box_group)
+    {
+        foreach(Transform hitbox in box_group)
+        {
+            Destroy(hitbox.gameObject);
+        }
     }
 
 }

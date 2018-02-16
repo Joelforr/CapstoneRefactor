@@ -28,7 +28,7 @@ public class AttackState : PlayerState {
 
     public override void AnimationTransitionEvent()
     {
-
+        parent.SetState(new IdleState(parent));
     }
 
     public override PlayerState HandleTransitions()
@@ -41,7 +41,8 @@ public class AttackState : PlayerState {
         //Switch statement
         //Play attack animation based off atk_type & direction
         //Animation handles state switching
-        
+        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/F_Slash_XAnimation") as XAnimation);
+
     }
 
     public override void OnStateExit()

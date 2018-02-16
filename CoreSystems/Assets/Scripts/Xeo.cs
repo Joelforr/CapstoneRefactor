@@ -80,6 +80,14 @@ namespace Xeo
 
     public class Utility
     {
+        public static GameObject CreateChildObj(string name, Transform parent)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.parent = parent;
+            obj.transform.localPosition = Vector3.zero;
+            return obj;
+        }
+
         public static Texture2D textureFromSprite(Sprite sprite)
         {
             if (sprite.rect.width != sprite.texture.width)

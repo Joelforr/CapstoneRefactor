@@ -26,12 +26,14 @@ public class HurtState : PlayerState{
         OnStateEnter();
     }
 
-    public HurtState(Player parent, float launchForce, float launchResist, float launchAngle)
+    public HurtState(Player parent, HitboxProperties properties)
     {
         this.parent = parent;
-        this.launchForce = launchForce;
-        this.launchResistance = launchResist;
-        this.launchAngle = launchAngle;
+        this.attack_damage = properties.attack_damage;
+        this.knockback_growth = properties.knockback_growth;
+        this.victim_percent = parent.vp;
+        this.base_knockback = properties.base_knockback;
+        this.launch_angle = properties.launch_angle;
         OnStateEnter();
     }
 

@@ -38,6 +38,8 @@ public class Player : MonoBehaviour {
 
     public float ad, kg, vp, bk, la;
 
+    public Rect hbox;
+
     private const float NEAR_ZERO = .0001f;
 
     // Use this for initialization
@@ -54,6 +56,7 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         UpdateDirectionalInformation();
+        _xAnimator.SetFacing(facing_direction);
         mState = mState.HandleTransitions();
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -65,7 +68,6 @@ public class Player : MonoBehaviour {
     {
         mState.Tick();
         UpdatePosition();
-        Debug.Log(mState);
     }
 
     private void UpdateDirectionalInformation()
@@ -77,7 +79,6 @@ public class Player : MonoBehaviour {
         if (Input.GetKey(KeyCode.DownArrow)) normalized_directional_input.y -= 1;
 
         if (normalized_directional_input.x != 0) facing_direction = normalized_directional_input.x;
-
     }
 
     private void UpdateState()
@@ -95,6 +96,16 @@ public class Player : MonoBehaviour {
         _rigidbody2D.MovePosition((Vector2)transform.position +
             new Vector2(_velocity.x * Time.deltaTime + horizontal_acceleration / 2 * Time.deltaTime * Time.deltaTime,
                         _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime));
+    }
+
+    public void SetState(PlayerState new_state)
+    {
+        mState = new_state;
+    }
+
+    private void XAnimatorCompletetionCall()
+    {
+        mState.AnimationTransitionEvent();
     }
 
 

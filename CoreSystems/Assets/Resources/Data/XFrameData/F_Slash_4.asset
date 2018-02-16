@@ -9,19 +9,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab2f221657098054a97dc77e9ffd5683, type: 3}
-  m_Name: Idle_0
+  m_Name: F_Slash_4
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: a8047e6436a3ceb42a87ae6cbd993443, type: 3}
-  lifetime: 10
+  sprite: {fileID: 21300000, guid: 71b6c4aa1e797d6458313b1a0cc869f6, type: 3}
+  lifetime: 2
   hitboxes: []
   hurtboxes:
   - type: 1
     _dimensions:
       serializedVersion: 2
-      x: 0.125
-      y: -0.25
-      width: 1.75
-      height: 3.75
+      x: 0.25
+      y: -0.67
+      width: 2
+      height: 3
     isTrigger: 1
     attack_damage: 0
     knockback_growth: 0
