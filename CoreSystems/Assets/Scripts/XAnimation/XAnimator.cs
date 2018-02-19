@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +19,7 @@ public class XAnimator : MonoBehaviour {
 
     private XFrame active_frame;
     private SpriteRenderer frameRenderer;
+    private Player parent_player;
 
     private float facing;
 
@@ -27,18 +27,19 @@ public class XAnimator : MonoBehaviour {
     private void Start()
     {
         frameRenderer = GetComponent<SpriteRenderer>();
+        parent_player = GetComponent<Player>();
         Init();
         //foreach group in xAnim create a child game object with the name of that group
     }
 
     private void Update()
     {
-        AnimateFrames();
+        
     }
 
     private void FixedUpdate()
     {
-        
+        AnimateFrames();
     }
 
     void AnimateFrames()
@@ -66,7 +67,7 @@ public class XAnimator : MonoBehaviour {
         {
             active_frame = xAnim.frames[0];
         }
-        catch (NullReferenceException e)
+        catch
         {
             Debug.LogError("Missing animation reference");
         }
@@ -94,7 +95,7 @@ public class XAnimator : MonoBehaviour {
         switch (xAnim.loop)
         {
             case false:
-                this.gameObject.SendMessage("XAnimatorCompletetionCall", SendMessageOptions.DontRequireReceiver);
+                parent_player.XAnimatorCompletetionCall();
                 break;
 
             default:
@@ -186,7 +187,7 @@ public class XAnimator : MonoBehaviour {
 
         if (properties.type == HitboxProperties.BoxType.Hit)
         {
-            Hitbox.AttachHitbox(collision_box, properties);
+            Hitbox.AttachHitbox(collision_box, properties, facing);
         }
         
     }

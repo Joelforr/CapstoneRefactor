@@ -32,10 +32,6 @@ public class Player : MonoBehaviour {
     private Vector2 _integratedVelocity;
     public float gravity;
 
-    public float Fl;
-    public float Fr;
-    public float theta;
-
     public float ad, kg, vp, bk, la;
 
     public Rect hbox;
@@ -58,10 +54,6 @@ public class Player : MonoBehaviour {
         UpdateDirectionalInformation();
         _xAnimator.SetFacing(facing_direction);
         mState = mState.HandleTransitions();
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            mState = new HurtState(this, ad, kg, vp, bk, la);
-        }
 	}
 
     private void FixedUpdate()
@@ -103,7 +95,7 @@ public class Player : MonoBehaviour {
         mState = new_state;
     }
 
-    private void XAnimatorCompletetionCall()
+    public void XAnimatorCompletetionCall()
     {
         mState.AnimationTransitionEvent();
     }

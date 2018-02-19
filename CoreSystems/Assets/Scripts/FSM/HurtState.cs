@@ -3,12 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HurtState : PlayerState{
-
-    private float launchForce;
-    private float launchResistance;
-    private float launchAngle;
-
-
     private float attack_damage;                //optimal value(ex, 3-11)
     private float knockback_growth;             //optimal value (ex, 1.1)
     private float victim_percent;              
@@ -17,6 +11,7 @@ public class HurtState : PlayerState{
 
     private float launch_velocity;
     private float launch_angle;
+    private float launch_direction;
     private float victim_launch_res;
     private int stun_duration;
 
@@ -26,7 +21,7 @@ public class HurtState : PlayerState{
         OnStateEnter();
     }
 
-    public HurtState(Player parent, HitboxProperties properties)
+    public HurtState(Player parent, HitboxProperties properties, float launch_direction)
     {
         this.parent = parent;
         this.attack_damage = properties.attack_damage;
@@ -34,6 +29,7 @@ public class HurtState : PlayerState{
         this.victim_percent = parent.vp;
         this.base_knockback = properties.base_knockback;
         this.launch_angle = properties.launch_angle;
+        this.launch_direction = launch_direction;
         OnStateEnter();
     }
 
@@ -70,7 +66,7 @@ public class HurtState : PlayerState{
     {
         launch_velocity = CalculateLaunchVelocity();
 
-        parent._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity;
+        parent._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity * Mathf.Sign(launch_direction);
         parent._velocity.y = Mathf.Sin(Mathf.Deg2Rad * launch_angle) * launch_velocity;
 
         stun_duration = Mathf.FloorToInt(launch_velocity * .9f);
@@ -84,7 +80,7 @@ public class HurtState : PlayerState{
     public override void Tick()
     {
         //parent._velocity.x -= Mathf.Cos(Mathf.Deg2Rad * launch_angle)*(launchResistance * Time.deltaTime);
-        parent._velocity.x = Mathf.Max(parent._velocity.x, 0);
+        //parent._velocity.x = Mathf.Max(parent._velocity.x, 0);
         //parent._velocity.y -= Mathf.Sin(Mathf.Deg2Rad * launch_angle)*(launchResistance * Time.deltaTime);
         parent._velocity.y += parent.gravity * Time.deltaTime;
         stun_duration--;
