@@ -35,6 +35,7 @@ public class FallState : PlayerState
 
     public override void OnStateEnter()
     {
+        parent.stamina -= 15f;
         parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.final_distance_to_peak, parent.horizontal_speed_max);
     }
 

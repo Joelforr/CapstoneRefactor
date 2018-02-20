@@ -28,7 +28,14 @@ public class IdleState : PlayerState {
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            return new JumpState(parent);
+            if (parent.stamina >= 15)
+            {
+                return new JumpState(parent);
+            }
+            else
+            {
+                return this;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -54,6 +61,7 @@ public class IdleState : PlayerState {
 
     public override void Tick()
     {
+        parent.RegenStamina();
         parent._velocity = Vector2.zero;
     }
 }

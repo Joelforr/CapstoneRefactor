@@ -28,13 +28,16 @@ public class Player : MonoBehaviour {
     public BoxCollider2D _physicsCollider { get; private set; }
     public XAnimator _xAnimator;
 
+    public float max_stamina;
+    public float stamina;
+    public float stamina_regen;
+    private float stamina_precentage;
+
     public Vector2 _velocity;
     private Vector2 _integratedVelocity;
     public float gravity;
 
     public float ad, kg, vp, bk, la;
-
-    public Rect hbox;
 
     private const float NEAR_ZERO = .0001f;
 
@@ -53,7 +56,8 @@ public class Player : MonoBehaviour {
 	void Update () {
         UpdateDirectionalInformation();
         _xAnimator.SetFacing(facing_direction);
-        mState = mState.HandleTransitions();
+        //mState = mState.HandleTransitions();
+        UpdateState();
 	}
 
     private void FixedUpdate()
@@ -100,5 +104,15 @@ public class Player : MonoBehaviour {
         mState.AnimationTransitionEvent();
     }
 
+    public void UpdateStaminaPrecentage()
+    {
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+        stamina_precentage = stamina / max_stamina;
+    }
 
+    public void RegenStamina()
+    {
+        stamina += stamina_regen;
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+    }
 }

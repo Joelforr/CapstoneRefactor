@@ -9,14 +9,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab2f221657098054a97dc77e9ffd5683, type: 3}
-  m_Name: Run_4
+  m_Name: Run_5
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: f85d381fe0c43a64eb827a3090a87e04, type: 3}
+  sprite: {fileID: 21300000, guid: 38cbb83978be18b4f92b2378559dfcb6, type: 3}
   lifetime: 3
-  groups: []
-  box_dimensions:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
+  hitboxes: []
+  hurtboxes: []

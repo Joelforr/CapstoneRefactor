@@ -64,6 +64,7 @@ public class HurtState : PlayerState{
 
     public override void OnStateEnter()
     {
+        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Knockback_XAnimation") as XAnimation);
         launch_velocity = CalculateLaunchVelocity();
 
         parent._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity * Mathf.Sign(launch_direction);
