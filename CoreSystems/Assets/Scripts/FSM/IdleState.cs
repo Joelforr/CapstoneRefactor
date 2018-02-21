@@ -39,7 +39,7 @@ public class IdleState : PlayerState {
         }
         else if (Input.GetKeyDown(KeyCode.Z))
         {
-            return new AttackState(parent);
+            return new AttackState(parent, AttackState.AttackType.Ground);
         }
         else
         {

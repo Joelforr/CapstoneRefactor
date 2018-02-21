@@ -28,7 +28,21 @@ public class AttackState : PlayerState {
 
     public override void AnimationTransitionEvent()
     {
-        parent.SetState(new IdleState(parent));
+        switch (attack_type)
+        {
+            case AttackType.Ground:
+                parent.SetState(new IdleState(parent));
+                break;
+
+            case AttackType.Air:
+                parent.SetState(new FallState(parent));
+                break;
+
+            default:
+                parent.SetState(new IdleState(parent));
+                break;
+        }
+     
     }
 
     public override PlayerState HandleTransitions()
@@ -52,7 +66,19 @@ public class AttackState : PlayerState {
 
     public override void Tick()
     {
-       
+        switch (attack_type)
+        {
+            case AttackType.Ground :
+                parent._velocity = Vector2.zero;
+                break;
+
+            case AttackType.Air:
+                parent._velocity.y += parent.gravity * Time.deltaTime;
+                break;
+
+            default:
+                break;
+        }
     }
 
 }

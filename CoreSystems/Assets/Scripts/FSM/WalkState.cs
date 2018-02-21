@@ -22,6 +22,10 @@ public class WalkState : PlayerState {
             OnStateExit();
             return new IdleState(parent);
         }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            return new AttackState(parent, AttackState.AttackType.Ground);
+        }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             return new JumpState(parent);

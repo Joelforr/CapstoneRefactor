@@ -26,6 +26,10 @@ public class JumpState: PlayerState {
         {
             return new JumpState(parent);
         }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            return new AttackState(parent, AttackState.AttackType.Air);
+        }
         else
         {
             return this;
@@ -34,6 +38,7 @@ public class JumpState: PlayerState {
 
     public override void OnStateEnter()
     {
+        parent.stamina -= 15f;
         parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Jump_XAnimation") as XAnimation);
         parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
         parent._velocity.y = PhysX.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
