@@ -28,7 +28,15 @@ public class WalkState : PlayerState {
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            return new JumpState(parent);
+
+            if (parent.stamina >= 15)
+            {
+                return new JumpState(parent);
+            }
+            else
+            {
+                return this;
+            }
         }
         else
         {
@@ -49,6 +57,8 @@ public class WalkState : PlayerState {
 
     public override void Tick()
     {
+        parent.RegenStamina();
+        parent.stamina -= .45f;
         if (Mathf.Abs(parent.normalized_directional_input.x) > .5f)       //.5f deadzone
         {
             parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;

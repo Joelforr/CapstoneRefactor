@@ -1182,9 +1182,9 @@ MonoBehaviour:
   normalized_directional_input: {x: 0, y: 0}
   facing_direction: 0
   _xAnimator: {fileID: 0}
-  max_stamina: 0
-  stamina: 0
-  stamina_regen: 0
+  max_stamina: 63
+  stamina: 63
+  stamina_regen: 0.5
   _velocity: {x: 0, y: 0}
   gravity: -0.1
   ad: 7
