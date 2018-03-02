@@ -22,7 +22,7 @@ public class JumpState: PlayerState {
         {
             return new FallState(parent);
         }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (Input.GetButtonDown(parent._inputManager.jump))
         {
             if (parent.stamina >= 15)
             {
@@ -33,7 +33,7 @@ public class JumpState: PlayerState {
                 return this;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Z))
+        else if (Input.GetButtonDown(parent._inputManager.fire))
         {
             return new AttackState(parent, AttackState.AttackType.Air);
         }
@@ -60,14 +60,21 @@ public class JumpState: PlayerState {
     {
         parent._velocity.y += parent.gravity * Time.deltaTime;
 
-        if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
+        if (parent.HasFlag(Player.CollidedSurface.LeftWall) || parent.HasFlag(Player.CollidedSurface.RightWall))
         {
-            parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
-            parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
+            parent._velocity.x = 0f;
         }
         else
         {
-            parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
+            if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
+            {
+                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
+                parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
+            }
+            else
+            {
+                parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
+            }
         }
     }
 

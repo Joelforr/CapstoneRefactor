@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Xeo;
+using EventList;
 
 public class HurtState : PlayerState{
     private float attack_damage;                //optimal value(ex, 3-11)
@@ -15,6 +17,9 @@ public class HurtState : PlayerState{
     private float victim_launch_res;
     private int stun_duration;
 
+    private Vector2 impulse_direction;
+
+
     public HurtState(Player parent)
     {
         this.parent = parent;
@@ -23,6 +28,7 @@ public class HurtState : PlayerState{
 
     public HurtState(Player parent, HitboxProperties properties, float launch_direction)
     {
+        eventManager = new EventManager();
         this.parent = parent;
         this.attack_damage = properties.attack_damage;
         this.knockback_growth = properties.knockback_growth;
@@ -64,11 +70,14 @@ public class HurtState : PlayerState{
 
     public override void OnStateEnter()
     {
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Knockback_XAnimation") as XAnimation);
-        launch_velocity = CalculateLaunchVelocity();
+        eventManager.AddHandler<CollisionEvent>(OnCollision);
 
+        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Knockback_XAnimation") as XAnimation);
+        parent.stamina -= CalculateDamage();
+        launch_velocity = CalculateLaunchVelocity();
         parent._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity * Mathf.Sign(launch_direction);
         parent._velocity.y = Mathf.Sin(Mathf.Deg2Rad * launch_angle) * launch_velocity;
+        impulse_direction = parent._velocity.normalized;
 
         stun_duration = Mathf.FloorToInt(launch_velocity * .9f);
     }
@@ -80,11 +89,39 @@ public class HurtState : PlayerState{
 
     public override void Tick()
     {
-        //parent._velocity.x -= Mathf.Cos(Mathf.Deg2Rad * launch_angle)*(launchResistance * Time.deltaTime);
+        parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0 ,Mathf.Cos(Mathf.Deg2Rad * launch_angle)*(15f * Time.deltaTime));
         //parent._velocity.x = Mathf.Max(parent._velocity.x, 0);
         //parent._velocity.y -= Mathf.Sin(Mathf.Deg2Rad * launch_angle)*(launchResistance * Time.deltaTime);
-        parent._velocity.y += parent.gravity * Time.deltaTime;
+        parent.GravityTick();
         stun_duration--;
+    }
+
+    void OnCollision(CollisionEvent e)
+    {
+        Debug.Log(parent._velocity.sqrMagnitude);
+        Vector2 num = Vector2.zero;
+
+        foreach (ContactPoint2D point in e.collision2D.contacts)
+        {
+            num += point.normal;
+        }
+
+        num /= e.collision2D.contacts.Length;
+        Debug.Log("First normal" + e.collision2D.contacts[0].normal);
+        Debug.Log("Average normal" + num);
+        Debug.Log("Pre Hit Vel: " + parent._velocity);
+        if((parent._velocity.sqrMagnitude > 1000))
+        {
+           
+            Vector2 reflection_dir = Vector3.Reflect(parent._velocity.normalized, e.collision2D.contacts[0].normal);      
+            parent._velocity = parent._velocity.magnitude * reflection_dir;
+            parent._velocity -= (parent._velocity * .2f);
+        }
+    }
+
+    private float CalculateDamage()
+    {
+        return 10;
     }
 
     private float CalculateLaunchVelocity()

@@ -18,15 +18,15 @@ public class IdleState : PlayerState {
 
     public override PlayerState HandleTransitions()
     {
-        if(!Collisions.IsGrounded(parent.transform, parent._physicsCollider, parent._collisionMask)){
+        if(!parent.HasFlag(Player.CollidedSurface.Ground)){
             return new FallState(parent);
         }
-        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        else if (parent._inputManager.controller.x != 0 && parent.HasFlag(Player.CollidedSurface.Ground))
         {
             //OnStateExit();
             return new WalkState(parent);
         }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (Input.GetButtonDown(parent._inputManager.jump))
         {
             if (parent.stamina >= 15)
             {
@@ -37,7 +37,7 @@ public class IdleState : PlayerState {
                 return this;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Z))
+        else if (Input.GetButtonDown(parent._inputManager.fire))
         {
             return new AttackState(parent, AttackState.AttackType.Ground);
         }

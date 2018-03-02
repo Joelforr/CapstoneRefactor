@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
+    public string controllerHor;
+    public string controllerVert;
+
+    public string jump;
+    public string fire;
+
+    public Vector2 controller { get; private set; }
+
     // Use this for initialization
 	void Start () {
 		
@@ -11,11 +19,7 @@ public class InputManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+        controller = new Vector2(Input.GetAxis(controllerHor), Input.GetAxis(controllerVert));
 	}
 
-    public void UpdateState()
-    {
-        //TransitionHandler += player.mState.handleInput()
-    }
 }

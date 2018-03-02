@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Xeo;
 
 public abstract class PlayerState :  IState {
 
     protected Player parent;
+    protected EventManager eventManager = new EventManager();
 
 
     public abstract PlayerState HandleTransitions();
@@ -15,5 +17,8 @@ public abstract class PlayerState :  IState {
     public abstract void OnStateExit();
     public abstract void AnimationTransitionEvent();
 
-    
+    public void FireCustomEvent(GameEvent e)
+    {
+        eventManager.Fire(e);
+    }
 }

@@ -1,11 +1,13 @@
-﻿
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Xeo
 {
     public class Collisions
     {
-        public static bool IsGrounded(Transform _transform, BoxCollider2D _physicsCollider, LayerMask _collisionMask)
+        public static bool IsGroundedOverlap(Transform _transform, BoxCollider2D _physicsCollider, LayerMask _collisionMask)
         {
             //Bottom Left
             Vector2 bl = _transform.TransformPoint(_physicsCollider.offset + new Vector2(-_physicsCollider.size.x / 2, -_physicsCollider.size.y / 2));
@@ -16,18 +18,154 @@ namespace Xeo
             return Physics2D.OverlapArea(bl, br, _collisionMask) != null;
 
         }
-    }
 
-   /* public class Input
+        public static bool IsGrounded(BoxCollider2D _physicsCollider, LayerMask _collisionMask, float checkDistance)
+        {
+            RaycastHit2D closestHit = Raycasting.GetClosestHit(_physicsCollider.bounds.center, Vector3.down, _physicsCollider, checkDistance, _collisionMask);
+            return closestHit.collider != null;
+        }
+
+        public static bool IsAgainstRightWall(BoxCollider2D _physicsCollider, LayerMask _collisionMask, float checkDistance)
+        {
+            RaycastHit2D  closestHit = Raycasting.GetClosestHit(_physicsCollider.bounds.center, Vector3.right, _physicsCollider, checkDistance, _collisionMask);
+            return closestHit.collider != null;
+        }
+
+        public static bool IsAgainstLeftWall( BoxCollider2D _physicsCollider, LayerMask _collisionMask, float checkDistance)
+        {
+            RaycastHit2D closestHit = Raycasting.GetClosestHit(_physicsCollider.bounds.center, Vector3.left, _physicsCollider, checkDistance, _collisionMask);
+            return closestHit.collider != null;
+        }
+    }
+   
+    public class EventManager
     {
+        public delegate void EventDelegate<T>(T e) where T : GameEvent;
+        private delegate void EventDelegate(GameEvent e);
 
-        public const string HORIZONTAL = "Horizontal";
-        public const string VERTICAL = "Vertical";
-        public const string JUMP = "Jump";
-        public const string DASH = "Fire1";
-        public const string SHIFT = "Shift";
+        private readonly Dictionary<Type, EventDelegate> _delegates = new Dictionary<Type, EventDelegate>();
+        private readonly Dictionary<Delegate, EventDelegate> _delegateLookup = new Dictionary<Delegate, EventDelegate>();
+        private readonly List<GameEvent> _queuedEvents = new List<GameEvent>();
+        private readonly object _queueLock = new object();
+
+        private static readonly EventManager _instance = new EventManager();
+        public static EventManager GlobalInstance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+        public EventManager() { }
+
+        public void AddHandler<T>(EventDelegate<T> del) where T : GameEvent
+        {
+            if (_delegateLookup.ContainsKey(del))
+            {
+                return;
+            }
+
+            EventDelegate internalDelegate = (e) => del((T)e);
+            _delegateLookup[del] = internalDelegate;
+
+            EventDelegate tempDel;
+            if (_delegates.TryGetValue(typeof(T), out tempDel))
+            {
+                _delegates[typeof(T)] = tempDel += internalDelegate;
+            }
+            else
+            {
+                _delegates[typeof(T)] = internalDelegate;
+            }
+        }
+
+        public void RemoveHandler<T>(EventDelegate<T> del) where T : GameEvent
+        {
+            EventDelegate internalDelegate;
+            if (_delegateLookup.TryGetValue(del, out internalDelegate))
+            {
+                EventDelegate tempDel;
+                if (_delegates.TryGetValue(typeof(T), out tempDel))
+                {
+                    tempDel -= internalDelegate;
+                    if (tempDel == null)
+                    {
+                        _delegates.Remove(typeof(T));
+                    }
+                    else
+                    {
+                        _delegates[typeof(T)] = tempDel;
+                    }
+                }
+                _delegateLookup.Remove(del);
+            }
+        }
+
+        public void Clear()
+        {
+            lock (_queueLock)
+            {
+                if (_delegates != null) _delegates.Clear();
+                if (_delegateLookup != null) _delegateLookup.Clear();
+                if (_queuedEvents != null) _queuedEvents.Clear();
+            }
+        }
+
+        public void Fire(GameEvent e)
+        {
+            EventDelegate del;
+            if (_delegates.TryGetValue(e.GetType(), out del))
+            {
+                del.Invoke(e);
+            }
+        }
+
+        public void ProcessQueuedEvents()
+        {
+            List<GameEvent> events;
+            lock (_queueLock)
+            {
+                if (_queuedEvents.Count > 0)
+                {
+                    events = new List<GameEvent>(_queuedEvents);
+                    _queuedEvents.Clear();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            foreach (var e in events)
+            {
+                Fire(e);
+            }
+        }
+
+        public void Queue(GameEvent e)
+        {
+            lock (_queueLock)
+            {
+                _queuedEvents.Add(e);
+            }
+        }
+
     }
-    */
+
+
+    /* public class Input
+     {
+
+         public const string HORIZONTAL = "Horizontal";
+         public const string VERTICAL = "Vertical";
+         public const string JUMP = "Jump";
+         public const string DASH = "Fire1";
+         public const string SHIFT = "Shift";
+     }
+     */
+
+    public class GameEvent { }
 
     public class Globals
     {
@@ -75,6 +213,25 @@ namespace Xeo
             y_velocity = (2 * jump_height * x_velocity) / (lateral_distance / 2);
 
             return y_velocity;
+        }
+    }
+
+    public class Raycasting
+    {
+        public static RaycastHit2D GetClosestHit(Vector2 origin, Vector3 direction, BoxCollider2D _physicsCollider, float distance, LayerMask _collisionMask, bool useBox = true)
+        {
+            if (useBox)
+            {
+                return Physics2D.BoxCast(
+                    origin,
+                    _physicsCollider.bounds.size,
+                    0f,
+                    direction,
+                    distance,
+                    _collisionMask);
+            }
+
+            return Physics2D.Raycast(origin, direction, distance, _collisionMask);
         }
     }
 
