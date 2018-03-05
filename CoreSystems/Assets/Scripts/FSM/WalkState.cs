@@ -65,7 +65,7 @@ public class WalkState : PlayerState {
         parent.RegenStamina();
         parent.stamina -= .45f;
 
-        if (parent.HasFlag(Player.CollidedSurface.LeftWall) || parent.HasFlag(Player.CollidedSurface.RightWall))
+        if (parent.IsPressingIntoLeftWall() || parent.IsPressingIntoRighttWall())
         {
             parent._velocity.x = 0f;
         }

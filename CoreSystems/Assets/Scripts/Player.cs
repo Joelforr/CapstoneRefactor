@@ -122,39 +122,7 @@ public class Player : MonoBehaviour {
                         _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime));
     }
 
-    public void SetState(PlayerState new_state)
-    {
-        mState = new_state;
-    }
-
-    public void XAnimatorCompletetionCall()
-    {
-        mState.AnimationTransitionEvent();
-    }
-
-    public void UpdateStaminaPrecentage()
-    {
-        stamina = Mathf.Clamp(stamina, 0, max_stamina);
-        stamina_precentage = stamina / max_stamina;
-    }
-  
-
-    public void GravityTick()
-    {
-        _velocity.y += _velocity.y <= gravity_cutoff ? 0 : gravity * Time.deltaTime; 
-    }
-
-    public bool HasFlag(CollidedSurface cs)
-    {
-        return (colliding_against & cs) != CollidedSurface.None;
-    }
-
-    public void RegenStamina()
-    {
-        stamina += stamina_regen;
-        stamina = Mathf.Clamp(stamina, 0, max_stamina);
-    }
-
+    
     private CollidedSurface CheckSurroundings()
     {
         CollidedSurface surfaces = CollidedSurface.None;
@@ -164,14 +132,12 @@ public class Player : MonoBehaviour {
             surfaces |= CollidedSurface.Ground;
         }
 
-        if (Xeo.Collisions.IsAgainstLeftWall(_physicsCollider, _collisionMask, env_check_dist) && 
-            normalized_directional_input.x < 0)
+        if (Xeo.Collisions.IsAgainstLeftWall(_physicsCollider, _collisionMask, env_check_dist))      
         {
             surfaces |= CollidedSurface.LeftWall;
         }
 
-        if (Xeo.Collisions.IsAgainstRightWall(_physicsCollider, _collisionMask, env_check_dist) &&
-            normalized_directional_input.x > 0)
+        if (Xeo.Collisions.IsAgainstRightWall(_physicsCollider, _collisionMask, env_check_dist))
         {
             surfaces |= CollidedSurface.RightWall;
         }
@@ -187,13 +153,63 @@ public class Player : MonoBehaviour {
             Physics2D.IgnoreCollision(_physicsCollider, collision.collider, true);
         }
         else
-        {
-            Physics2D.IgnoreCollision(_physicsCollider, collision.collider, false);
-        }
+        {                                                                                         //does not work
+            Physics2D.IgnoreCollision(_physicsCollider, collision.collider, false);               //Store refernce to collider hit
+        }                                                                                         //Enable collision after some time has passed 
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
         {
             mState.FireCustomEvent(new CollisionEvent(this, collision));
         }
     }
+
+
+    #region public
+    public void SetState(PlayerState new_state)
+    {
+        mState = new_state;
+    }
+
+    public void XAnimatorCompletetionCall()
+    {
+        mState.AnimationTransitionEvent();
+    }
+
+    public void UpdateStaminaPrecentage()
+    {
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+        stamina_precentage = stamina / max_stamina;
+    }
+
+    public int GetPercentStamina()
+    {
+        return Mathf.CeilToInt(stamina / max_stamina);
+    }
+
+    public void GravityTick()
+    {
+        _velocity.y += _velocity.y <= gravity_cutoff ? 0 : gravity * Time.deltaTime;
+    }
+
+    public bool HasFlag(CollidedSurface cs)
+    {
+        return (colliding_against & cs) != CollidedSurface.None;
+    }
+
+    public bool IsPressingIntoLeftWall()
+    {
+        return HasFlag(CollidedSurface.LeftWall) && normalized_directional_input.x < 0;
+    }
+
+    public bool IsPressingIntoRighttWall()
+    {
+        return HasFlag(CollidedSurface.RightWall) && normalized_directional_input.x > 0;
+    }
+
+    public void RegenStamina()
+    {
+        stamina += stamina_regen;
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+    }
+    #endregion
 }

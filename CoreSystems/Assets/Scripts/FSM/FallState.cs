@@ -59,7 +59,7 @@ public class FallState : PlayerState
     {
         parent._velocity.y += parent.gravity * Time.deltaTime;
 
-        if (parent.HasFlag(Player.CollidedSurface.LeftWall) || parent.HasFlag(Player.CollidedSurface.RightWall))
+        if (parent.IsPressingIntoLeftWall() || parent.IsPressingIntoRighttWall())
         {
             parent._velocity.x = 0f;
         }

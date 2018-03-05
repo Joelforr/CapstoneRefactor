@@ -121,7 +121,7 @@ public class HurtState : PlayerState{
 
     private float CalculateDamage()
     {
-        return 10;
+        return attack_damage;
     }
 
     private float CalculateLaunchVelocity()

@@ -16,5 +16,16 @@ namespace EventList
             this.collision2D = collision2D;
         }
     }
+
+    public class WallInteractionEvent : GameEvent
+    {
+        public Player sender;
+        public Player.CollidedSurface wall;
+
+        public WallInteractionEvent()
+        {
+            
+        }
+    }
 }
 
