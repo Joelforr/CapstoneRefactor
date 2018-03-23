@@ -7,8 +7,8 @@ public class XFrame : ScriptableObject
     public Sprite sprite;
     public int lifetime;
 
-    public List<HitboxProperties> hitboxes;
-    public List<HitboxProperties> hurtboxes;
+    public List<CollisionBoxData> hitboxes;
+    public List<CollisionBoxData> hurtboxes;
 }
 
 public class Group
@@ -31,7 +31,7 @@ public class LayerProperties
 }
 
 [System.Serializable]
-public class HitboxProperties
+public class CollisionBoxData
 {
     public enum BoxType
     {

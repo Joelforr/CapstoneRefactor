@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Xeo;
+using EventList;
 
 public class IdleState : PlayerState {
 
@@ -9,11 +10,6 @@ public class IdleState : PlayerState {
     {
         this.parent = parent;
         OnStateEnter();
-    }
-
-    public override void AnimationTransitionEvent()
-    {
-
     }
 
     public override PlayerState HandleTransitions()
@@ -39,7 +35,14 @@ public class IdleState : PlayerState {
         }
         else if (Input.GetButtonDown(parent._inputManager.fire))
         {
-            return new AttackState(parent, AttackState.AttackType.Ground);
+            if (parent.stamina >= 10)
+            {
+                return new AttackState(parent, AttackState.AttackType.Ground);
+            }
+            else
+            {
+                return this;
+            }
         }
         else
         {
@@ -49,6 +52,8 @@ public class IdleState : PlayerState {
 
     public override void OnStateEnter()
     {
+        eventManager.AddHandler<HitEvent>(OnHit);
+
         parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Idle_XAnimation") as XAnimation);
         //if (parent._velocity != Vector2.zero) parent._velocity = Vector2.zero;
         
@@ -62,6 +67,7 @@ public class IdleState : PlayerState {
     public override void Tick()
     {
         parent.RegenStamina();
-        parent._velocity = Vector2.zero;
+        parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag/3);
+        parent._velocity.y = 0;
     }
 }

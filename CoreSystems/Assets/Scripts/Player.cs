@@ -8,6 +8,10 @@ using EventList;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
 
+    public float horizontal_attack_speed;
+    public float horizontal_attack_drag;
+    public float horizontal_air_acceleration;
+    public float horizontal_air_speed;
     public float horizontal_speed_max;
     public float horizontal_acceleration;
     public float horizontal_drag;
@@ -16,6 +20,7 @@ public class Player : MonoBehaviour {
     public float initial_distance_to_peak;
     public float final_distance_to_peak;
     public float air_drag;
+    public float doublejump_height;
 
     public LayerMask _collisionMask;
     [Flags]
@@ -28,13 +33,13 @@ public class Player : MonoBehaviour {
         Cieling = 0x8
     }
 
-    private CollidedSurface colliding_against;
+    public CollidedSurface colliding_against { get; private set;}
     private float env_check_dist = 0.04f;
 
     public Vector2 normalized_directional_input;
     public float facing_direction;
 
-    public PlayerState mState;
+    public PlayerState mState { get; private set;}
     public PlayerState previousState { get; private set;}
 
     private Rigidbody2D _rigidbody2D; 
@@ -62,7 +67,6 @@ public class Player : MonoBehaviour {
         _physicsCollider = this.GetComponent<BoxCollider2D>();
         _xAnimator = this.GetComponent<XAnimator>();
         _inputManager = this.GetComponent<InputManager>();
-
         mState = new IdleState(this);
         gravity = PhysX.CalculateGravity(jump_height_max, initial_distance_to_peak, horizontal_speed_max);
 	}
@@ -75,8 +79,7 @@ public class Player : MonoBehaviour {
         UpdateState();
         colliding_against = CheckSurroundings();
 
-        //Debug.Log(mState);
-        Debug.Log(colliding_against);
+        //Debug.Log(colliding_against);
 	}
 
     private void FixedUpdate()
@@ -113,9 +116,6 @@ public class Player : MonoBehaviour {
 
     private void UpdatePosition()
     {
-        //_integratedVelocity.x = _velocity.x * Time.deltaTime + horizontal_acceleration / 2 * Time.deltaTime * Time.deltaTime;
-        //_integratedVelocity.y = _velocity.y * Time.deltaTime + gravity / 2 * Time.deltaTime * Time.deltaTime;
-        //Debug.Log(_integratedVelocity);
 
         _rigidbody2D.MovePosition((Vector2)transform.position +
             new Vector2(_velocity.x * Time.deltaTime + horizontal_acceleration / 2 * Time.deltaTime * Time.deltaTime,
@@ -147,14 +147,13 @@ public class Player : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log(_velocity.sqrMagnitude);
         if(collision.gameObject.layer == LayerMask.NameToLayer("Physx") && _velocity.sqrMagnitude > 800f)
         {
-            Physics2D.IgnoreCollision(_physicsCollider, collision.collider, true);
+           // Physics2D.IgnoreCollision(_physicsCollider, collision.collider, true);
         }
         else
         {                                                                                         //does not work
-            Physics2D.IgnoreCollision(_physicsCollider, collision.collider, false);               //Store refernce to collider hit
+           // Physics2D.IgnoreCollision(_physicsCollider, collision.collider, false);               //Store refernce to collider hit
         }                                                                                         //Enable collision after some time has passed 
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("Platform"))
@@ -165,25 +164,10 @@ public class Player : MonoBehaviour {
 
 
     #region public
-    public void SetState(PlayerState new_state)
-    {
-        mState = new_state;
-    }
 
-    public void XAnimatorCompletetionCall()
+    public float GetPercentStamina()
     {
-        mState.AnimationTransitionEvent();
-    }
-
-    public void UpdateStaminaPrecentage()
-    {
-        stamina = Mathf.Clamp(stamina, 0, max_stamina);
-        stamina_precentage = stamina / max_stamina;
-    }
-
-    public int GetPercentStamina()
-    {
-        return Mathf.CeilToInt(stamina / max_stamina);
+        return Mathf.Clamp(stamina / max_stamina,0,1);
     }
 
     public void GravityTick()
@@ -210,6 +194,23 @@ public class Player : MonoBehaviour {
     {
         stamina += stamina_regen;
         stamina = Mathf.Clamp(stamina, 0, max_stamina);
+    }
+
+    public void RegenStamina(float regen_amount)
+    {
+        stamina += regen_amount;
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+    }
+
+    public void SetState(PlayerState new_state)
+    {
+        mState = new_state;
+    }
+
+    public void UpdateStaminaPrecentage()
+    {
+        stamina = Mathf.Clamp(stamina, 0, max_stamina);
+        stamina_precentage = stamina / max_stamina;
     }
     #endregion
 }

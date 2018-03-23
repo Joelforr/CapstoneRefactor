@@ -5,12 +5,13 @@ using UnityEngine;
 public class Hitbox : MonoBehaviour {
 
     private Player parent_player;
-    private HitboxProperties properties;
+    private CollisionBoxData properties;
     private float attack_damage;
     private float knockback_growth;
     private float base_knockback;
     private float launch_angle;
     private float launch_direction;
+    private int i = 0;
 
     // Use this for initialization
     void Start () {
@@ -22,7 +23,7 @@ public class Hitbox : MonoBehaviour {
 		
 	}
 
-    public static void AttachHitbox(GameObject obj, HitboxProperties hitboxProperties, float launch_direction)
+    public static void AttachHitbox(GameObject obj, CollisionBoxData hitboxProperties, float launch_direction)
     {
         Hitbox instance = obj.AddComponent<Hitbox>();
         instance.properties = hitboxProperties;
@@ -37,18 +38,13 @@ public class Hitbox : MonoBehaviour {
     {
         if(collision.gameObject != transform.parent)
         {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Hurt"))
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Hurt") && i == 0)
             {
-                try
-                {
+                    Debug.Log(this.name);
                     Player player_hit = collision.gameObject.GetComponentInParent<Player>();
-                    player_hit.SetState(new HurtState(player_hit, properties, launch_direction));
-                }
-                catch
-                {
-                    Debug.Log(collision.gameObject.name);
-                    Debug.Log("failed to get player component");
-                }
+                    player_hit.mState.FireCustomEvent(new EventList.HitEvent(player_hit, properties, launch_direction));
+                    i++;
+                    Debug.Log(i);
             }
             
         }

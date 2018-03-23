@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Xeo;
+using EventList;
 
 public class JumpState: PlayerState {
+
+    private bool doublejump = false;
 
     public JumpState(Player parent)
     {
@@ -11,10 +14,13 @@ public class JumpState: PlayerState {
         OnStateEnter();
     }
 
-    public override void AnimationTransitionEvent()
+    public JumpState(Player parent, bool doublejump)
     {
-        
+        this.parent = parent;
+        this.doublejump = doublejump;
+        OnStateEnter();
     }
+
 
     public override PlayerState HandleTransitions()
     {
@@ -26,7 +32,7 @@ public class JumpState: PlayerState {
         {
             if (parent.stamina >= 15)
             {
-                return new JumpState(parent);
+                return new JumpState(parent, true);
             }
             else
             {
@@ -35,7 +41,15 @@ public class JumpState: PlayerState {
         }
         else if (Input.GetButtonDown(parent._inputManager.fire))
         {
-            return new AttackState(parent, AttackState.AttackType.Air);
+            if (parent.stamina >= 10)
+            {
+                return new AttackState(parent, AttackState.AttackType.Air);
+            }
+            else
+            {
+                return this;
+            }
+
         }
         else
         {
@@ -45,10 +59,23 @@ public class JumpState: PlayerState {
 
     public override void OnStateEnter()
     {
-        parent.stamina -= 15f;
+        //Handler Setup
+        eventManager.AddHandler<HitEvent>(OnHit);
+
+        //Initializing things
+        //parent.stamina -= 15f;
         parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Jump_XAnimation") as XAnimation);
-        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
-        parent._velocity.y = PhysX.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_speed_max);
+
+        if (doublejump == false)
+        {
+            parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+            parent._velocity.y = PhysX.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+        }
+        else
+        {
+            parent.gravity = PhysX.CalculateGravity(parent.doublejump_height, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+            parent._velocity.y = PhysX.CalculateJumpVelocity(parent.doublejump_height, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+        }
     }
 
     public override void OnStateExit()
@@ -68,12 +95,17 @@ public class JumpState: PlayerState {
         {
             if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
             {
-                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
-                parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
+                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_air_acceleration;
+
+                if (parent._velocity.x > parent.horizontal_air_speed || parent._velocity.x < -parent.horizontal_air_speed)
+                {
+                    parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                }
+                //parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_air_speed), -parent.horizontal_air_speed);
             }
             else
             {
-                parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag);
+                parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
             }
         }
     }

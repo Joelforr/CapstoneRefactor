@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Xeo;
+using EventList;
 
 public class WalkState : PlayerState {
 
@@ -9,11 +10,6 @@ public class WalkState : PlayerState {
     {
         this.parent = parent;
         OnStateEnter();
-    }
-
-    public override void AnimationTransitionEvent()
-    {
-
     }
 
     public override PlayerState HandleTransitions()
@@ -29,7 +25,14 @@ public class WalkState : PlayerState {
         }
         else if (Input.GetButtonDown(parent._inputManager.fire))
         {
-            return new AttackState(parent, AttackState.AttackType.Ground);
+            if (parent.stamina >= 10)
+            {
+                return new AttackState(parent, AttackState.AttackType.Ground);
+            }
+            else
+            {
+                return this;
+            }
         }
         else if (Input.GetButtonDown(parent._inputManager.jump))
         {
@@ -51,6 +54,8 @@ public class WalkState : PlayerState {
 
     public override void OnStateEnter()
     {
+        eventManager.AddHandler<HitEvent>(OnHit);
+
         parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
         parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Run_XAnimation") as XAnimation);
     }
@@ -62,8 +67,8 @@ public class WalkState : PlayerState {
 
     public override void Tick()
     {
-        parent.RegenStamina();
-        parent.stamina -= .45f;
+        parent.RegenStamina(.05f);
+        //parent.stamina -= .45f;
 
         if (parent.IsPressingIntoLeftWall() || parent.IsPressingIntoRighttWall())
         {

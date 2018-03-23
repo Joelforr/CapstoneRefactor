@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Xeo;
+using EventList;
 
 public class FallState : PlayerState
 {
@@ -12,10 +13,6 @@ public class FallState : PlayerState
         OnStateEnter();
     }
 
-    public override void AnimationTransitionEvent()
-    {
-     
-    }
 
     public override PlayerState HandleTransitions()
     {
@@ -36,7 +33,14 @@ public class FallState : PlayerState
         }
         else if (Input.GetButtonDown(parent._inputManager.fire))
         {
-            return new AttackState(parent, AttackState.AttackType.Air);
+            if (parent.stamina >= 10)
+            {
+                return new AttackState(parent, AttackState.AttackType.Air);
+            }
+            else
+            {
+                return this;
+            }
         }
         else
         {
@@ -46,8 +50,10 @@ public class FallState : PlayerState
 
     public override void OnStateEnter()
     {
+        eventManager.AddHandler<HitEvent>(OnHit);
+
         parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Jump_XAnimation") as XAnimation);
-        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.final_distance_to_peak, parent.horizontal_speed_max);
+        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.final_distance_to_peak, parent.horizontal_air_speed);
     }
 
     public override void OnStateExit()
@@ -67,8 +73,12 @@ public class FallState : PlayerState
         {
             if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
             {
-                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
-                parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
+                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_air_acceleration;
+                //parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
+                if (parent._velocity.x > parent.horizontal_air_speed || parent._velocity.x < -parent.horizontal_air_speed)
+                {
+                    parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                }
             }
             else
             {

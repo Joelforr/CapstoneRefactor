@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: F_Slash_1
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: efee555d9eeb91b4c93e095061fd7320, type: 3}
-  lifetime: 3
+  lifetime: 2
   hitboxes: []
   hurtboxes:
   - type: 1
