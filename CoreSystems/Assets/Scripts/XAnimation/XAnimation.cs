@@ -20,7 +20,7 @@ public class XAnimation : ScriptableObject {
         return frames[frames.Count - 1];
     }
 
-    public int GetTotalFrameLength()
+    public int GetTotalAnimationTime()
     {
         int num = 0;
 

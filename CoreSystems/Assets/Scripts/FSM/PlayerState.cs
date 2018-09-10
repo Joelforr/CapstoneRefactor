@@ -6,9 +6,12 @@ using EventList;
 
 public abstract class PlayerState :  IState {
 
-    protected Player parent;
+    protected FSM sm;
     protected EventManager eventManager = new EventManager();
+    public float cost = 0;
+    public int orbCost = 0;
 
+    protected BaseCharacter character;
 
     public abstract PlayerState HandleTransitions();
 
@@ -28,7 +31,7 @@ public abstract class PlayerState :  IState {
 
     protected virtual void OnHit(HitEvent e)
     {
-        parent.SetState(new HurtState(e.player_hit, e.properties, e.launch_dir));
+        sm.TransitionTo(new HurtState(e.player_hit._sm, e.properties, e.launch_dir));
     }
 
   

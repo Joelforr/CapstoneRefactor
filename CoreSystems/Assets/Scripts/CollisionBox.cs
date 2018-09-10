@@ -12,7 +12,7 @@ public class CollisionBox : MonoBehaviour {
     private CollisionBoxData.BoxType boxType;
 
     //Refernces
-    public Player owner;
+    public BaseCharacter owner;
     private BoxCollider2D _collider;
     private SpriteRenderer _spriteRenderer;
 
@@ -28,7 +28,7 @@ public class CollisionBox : MonoBehaviour {
 		
 	}
 
-    public void Activate(string name, Transform parent, Player owner, CollisionBoxData properties, float facing, bool drawDebug = true)
+    public void Activate(string name, Transform parent, BaseCharacter owner, CollisionBoxData properties, float facing, bool drawDebug = true)
     {
         isInUse = true;
         isDebug = drawDebug;
@@ -77,6 +77,10 @@ public class CollisionBox : MonoBehaviour {
 
                 case CollisionBoxData.BoxType.Hurt:
                     _spriteRenderer.color = new Color(0, 1, 0, 0.5f);
+                    break;
+
+                case CollisionBoxData.BoxType.Gaurd:
+                    _spriteRenderer.color = new Color(0, 0, 1, 0.5f);
                     break;
 
                 default:

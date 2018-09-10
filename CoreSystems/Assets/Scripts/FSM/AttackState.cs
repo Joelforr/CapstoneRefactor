@@ -10,6 +10,8 @@ public class AttackState : PlayerState {
     private float timeStart;
     private float frameCount;
 
+    private Vector2 di;
+
     public enum AttackType
     {
         Ground,
@@ -19,17 +21,20 @@ public class AttackState : PlayerState {
     private AttackType attack_type;
     private Vector2 analog_dir;
 
-    public AttackState(Player parent)
+    public AttackState(FSM parent)
     {
-        this.parent = parent;
-        OnStateEnter();
+        this.sm = parent;
+        this.di = sm._character.player.GetAxis2D(0,1);
+        this.cost = 10f;
+        this.orbCost = 1;
     }
 
-    public AttackState(Player parent, AttackType atk_type)
+    public AttackState(FSM parent, Vector2 directionalInfluence)
     {
-        this.parent = parent;
-        this.attack_type = atk_type;
-        OnStateEnter();
+        this.sm = parent;
+        this.di = directionalInfluence;
+        this.cost = 10f;
+        this.orbCost = 1;
     }
 
     protected override void OnAnimationComplete(AnimationCompleteEvent e)
@@ -37,15 +42,15 @@ public class AttackState : PlayerState {
         switch (attack_type)
         {
             case AttackType.Ground:
-                parent.SetState(new IdleState(parent));
+                sm.TransitionTo(new IdleState(sm));
                 break;
 
             case AttackType.Air:
-                parent.SetState(new FallState(parent));
+                sm.TransitionTo(new FallState(sm));
                 break;
 
             default:
-                parent.SetState(new IdleState(parent));
+                sm.TransitionTo(new IdleState(sm));
                 break;
         }
      
@@ -62,57 +67,80 @@ public class AttackState : PlayerState {
         eventManager.AddHandler<HitEvent>(OnHit);
         eventManager.AddHandler<AnimationCompleteEvent>(OnAnimationComplete);
 
-        timeStart = Time.time;
-        Debug.Log("TimeS: " + timeStart);
-        Debug.Log("TimeG: " + (timeStart + (7f/60f)));
-
+        Debug.Log(Xeo.Math.ToAng(di));
         //Switch statement
+        switch (sm.previousState.GetType() == typeof(JumpState) || sm.previousState.GetType() == typeof(FallState))
+        {
+            case true:
+                attack_type = AttackType.Air;
+        
+                if (Xeo.Math.ToAng(di) >= 50f && Xeo.Math.ToAng(di) <= 130f)
+                {
+                    sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Attack_U_A) as XAnimation);
+                }
+                else if (Xeo.Math.ToAng(di) >= 230f && Xeo.Math.ToAng(di) <= 310f)
+                {
+                    sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Attack_D_A) as XAnimation);
+                }
+                else
+                {
+                    sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Attack_S_A) as XAnimation);
+                }
+                break;
+            case false:
+                if (Xeo.Math.ToAng(di) >= 50f && Xeo.Math.ToAng(di) <= 130f)
+                {
+                    sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Attack_U_G) as XAnimation);
+                }
+                else
+                {
+                    sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Attack_S_G) as XAnimation);
+                }
+                break;
+            default:
+                
+                break;
+        }
+
         //Play attack animation based off atk_type & direction
         //Animation handles state switching
-
-        //parent.stamina -= 15f;
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/F_Slash_XAnimation") as XAnimation);
-
+        
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+        //Adjust Cooldowns And Timers
+        sm.SetTimer(this.GetType());
+
+        eventManager.RemoveHandler<HitEvent>(OnHit);
+        eventManager.RemoveHandler<AnimationCompleteEvent>(OnAnimationComplete);
     }
 
     public override void Tick()
     {
-        Debug.Log(Time.time);
-        if (Time.time > (timeStart + (7f / 60f)))
-        {
-            if (Input.GetButtonDown(parent._inputManager.jump)){
-                Debug.Log("Tried to jump");
-                parent.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 100f));
-            }
-        }
 
         switch (attack_type)
         {
             case AttackType.Ground :
                 //parent._velocity = Vector2.zero;
 
-                if (Mathf.Abs(parent.normalized_directional_input.x) > .5f)       //.5f deadzone
+                if (Mathf.Abs(sm._character.directionalInput.x) > .5f)       //.5f deadzone
                 {
-                    parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_acceleration;
+                    sm._character._velocity.x += sm._character.directionalInput.x * sm._character.horizontal_acceleration;
 
-                    if (parent._velocity.x > parent.horizontal_attack_speed || parent._velocity.x < -parent.horizontal_attack_speed)
+                    if (sm._character._velocity.x > sm._character.horizontal_attack_speed || sm._character._velocity.x < -sm._character.horizontal_attack_speed)
                     {
-                        parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_attack_drag);
+                        sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0, sm._character.horizontal_attack_drag);
                     }
                 }
                 else
                 {
-                    parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_attack_drag);
+                    sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0, sm._character.horizontal_attack_drag);
                 }
                 break;
 
             case AttackType.Air:
-                parent._velocity.y += parent.gravity * Time.deltaTime;
+                sm._character._velocity.y += sm._character.gravity * Time.deltaTime;
                 break;
 
             default:

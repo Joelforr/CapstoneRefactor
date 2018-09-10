@@ -6,50 +6,41 @@ using EventList;
 
 public class JumpState: PlayerState {
 
-    private bool doublejump = false;
+    private bool pressed;
+    private bool held;
+    
 
-    public JumpState(Player parent)
-    {
-        this.parent = parent;
-        OnStateEnter();
-    }
+    
 
-    public JumpState(Player parent, bool doublejump)
+    public JumpState(FSM parent)
     {
-        this.parent = parent;
-        this.doublejump = doublejump;
-        OnStateEnter();
+        this.sm = parent;
+        this.cost = 3f;
+
+        this.orbCost = (sm._character.IsGrounded()) ? 0 : 1;
+        pressed = true;
+        held = true;
     }
 
 
     public override PlayerState HandleTransitions()
     {
-        if(parent._velocity.y < 0)
-        {
-            return new FallState(parent);
-        }
-        else if (Input.GetButtonDown(parent._inputManager.jump))
-        {
-            if (parent.stamina >= 15)
-            {
-                return new JumpState(parent, true);
-            }
-            else
-            {
-                return this;
-            }
-        }
-        else if (Input.GetButtonDown(parent._inputManager.fire))
-        {
-            if (parent.stamina >= 10)
-            {
-                return new AttackState(parent, AttackState.AttackType.Air);
-            }
-            else
-            {
-                return this;
-            }
 
+        if(sm._character._velocity.y < 0)
+        {
+            return new FallState(sm);
+        }
+        else if (sm._character.player.GetButtonDown(4) && sm.jumpGraceFrames <= 0 && sm.jumpCount < sm.jumpsAllowed)
+        {
+            return new JumpState(sm);
+        }
+        else if (sm._character.player.GetButtonDown(2) && sm.attackGraceFrames <= 0)
+        {
+            return new AttackState(sm);       
+        }
+        else if (sm._character.player.GetButtonDown(3) && sm.dodgeGraceFrames <= 0)
+        {
+            return new DodgeState(sm);
         }
         else
         {
@@ -59,55 +50,91 @@ public class JumpState: PlayerState {
 
     public override void OnStateEnter()
     {
+        //Adjust Cooldowns And Timers
+        //Because you can transition from JumpState to JumpState this  
+        //is set in OnStateEnter and is slightly longer
+        sm.SetTimer(this.GetType());
+
         //Handler Setup
+        eventManager.AddHandler<CollisionEvent>(OnCollision);
         eventManager.AddHandler<HitEvent>(OnHit);
 
-        //Initializing things
-        //parent.stamina -= 15f;
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Jump_XAnimation") as XAnimation);
+        //Set Animation
+        sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Jump) as XAnimation);
 
-        if (doublejump == false)
+
+        //Play Audio
+        sm._character.sfxPlayer.Play(Services.SFXLibrary.GetSFX(SFXLibrary.SFXTags.Jump));
+
+        //Pre-Calculations
+        if (sm.jumpCount <= 1)
         {
-            parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_air_speed);
-            parent._velocity.y = PhysX.CalculateJumpVelocity(parent.jump_height_max, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+            sm._character.gravity = PhysX.CalculateGravity(sm._character.jump_height_max, sm._character.initial_distance_to_peak, sm._character.horizontal_air_speed);
+            sm._character._velocity.y = PhysX.CalculateJumpVelocity(sm._character.jump_height_max, sm._character.initial_distance_to_peak, sm._character.horizontal_air_speed);
         }
         else
         {
-            parent.gravity = PhysX.CalculateGravity(parent.doublejump_height, parent.initial_distance_to_peak, parent.horizontal_air_speed);
-            parent._velocity.y = PhysX.CalculateJumpVelocity(parent.doublejump_height, parent.initial_distance_to_peak, parent.horizontal_air_speed);
+            sm._character.gravity = PhysX.CalculateGravity(sm._character.airJumpHeight, sm._character.airDistanceToPeak, sm._character.horizontal_air_speed);
+            sm._character._velocity.y = PhysX.CalculateJumpVelocity(sm._character.airJumpHeight, sm._character.airDistanceToPeak, sm._character.horizontal_air_speed);
         }
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+        //Set Animation
+        sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Fall) as XAnimation);
+
+
+        //Stop Audio
+        sm._character.sfxPlayer.Stop();
+
+        eventManager.RemoveHandler<HitEvent>(OnHit);
+
     }
 
     public override void Tick()
     {
-        parent._velocity.y += parent.gravity * Time.deltaTime;
+        sm._character.SetFacing();
 
-        if (parent.IsPressingIntoLeftWall() || parent.IsPressingIntoRighttWall())
+        sm._character._velocity.y += sm._character.gravity * Time.deltaTime;
+
+        if (sm._character.IsPressingIntoLeftWall() || sm._character.IsPressingIntoRighttWall())
         {
-            parent._velocity.x = 0f;
+            sm._character._velocity.x = 0f;
         }
         else
         {
-            if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
+            if (Mathf.Abs(sm._character.directionalInput.x) > .2f)
             {
-                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_air_acceleration;
+                sm._character._velocity.x += sm._character.directionalInput.x * sm._character.horizontal_air_acceleration;
 
-                if (parent._velocity.x > parent.horizontal_air_speed || parent._velocity.x < -parent.horizontal_air_speed)
+
+                if (sm._character._velocity.x > sm._character.horizontal_speed_max)
                 {
-                    parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                    sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, sm._character.horizontal_speed_max, sm._character.air_drag);
                 }
+
+                if(sm._character._velocity.x < -sm._character.horizontal_speed_max)
+                {
+                    sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, -sm._character.horizontal_speed_max, sm._character.air_drag);
+                }
+
                 //parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_air_speed), -parent.horizontal_air_speed);
             }
             else
             {
-                parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0, sm._character.air_drag);
             }
         }
     }
 
+    void OnCollision(CollisionEvent e)
+    {
+
+        if (e.collision2D.contacts[0].normal == Vector2.down)
+        {
+            sm._character._velocity.y = 0;
+        }
+
+    }
 }

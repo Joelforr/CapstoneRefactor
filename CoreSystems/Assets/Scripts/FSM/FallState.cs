@@ -7,40 +7,29 @@ using EventList;
 public class FallState : PlayerState
 {
 
-    public FallState(Player parent)
+    public FallState(FSM parent)
     {
-        this.parent = parent;
-        OnStateEnter();
+        this.sm = parent;
     }
 
 
     public override PlayerState HandleTransitions()
     {
-        if(parent.HasFlag(Player.CollidedSurface.Ground))
+        if(sm._character.HasFlag(BaseCharacter.CollidedSurface.Ground))
         {
-            return new IdleState(parent);
+            return new IdleState(sm);
         }
-        else if (Input.GetButtonDown(parent._inputManager.jump))
+        else if (sm._character.player.GetButtonDown(4) && sm.jumpGraceFrames <= 0 && sm.jumpCount < sm.jumpsAllowed)
         {
-            if (parent.stamina >= 15)
-            {
-                return new JumpState(parent);
-            }
-            else
-            {
-                return this;
-            }
+            return new JumpState(sm);
         }
-        else if (Input.GetButtonDown(parent._inputManager.fire))
+        else if (sm._character.player.GetButtonDown(2) && sm.attackGraceFrames <= 0)
         {
-            if (parent.stamina >= 10)
-            {
-                return new AttackState(parent, AttackState.AttackType.Air);
-            }
-            else
-            {
-                return this;
-            }
+            return new AttackState(sm);       
+        }
+        else if (sm._character.player.GetButtonDown(3) && sm.dodgeGraceFrames <= 0)
+        {
+            return new DodgeState(sm);
         }
         else
         {
@@ -50,39 +39,59 @@ public class FallState : PlayerState
 
     public override void OnStateEnter()
     {
+        //Handler Setup
         eventManager.AddHandler<HitEvent>(OnHit);
 
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Jump_XAnimation") as XAnimation);
-        parent.gravity = PhysX.CalculateGravity(parent.jump_height_max, parent.final_distance_to_peak, parent.horizontal_air_speed);
+        //Set Animation
+        sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Fall) as XAnimation);
+
+        //Pre-Calculations
+        sm._character.gravity = PhysX.CalculateGravity(sm._character.jump_height_max, sm._character.final_distance_to_peak, sm._character.horizontal_air_speed);
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+        eventManager.RemoveHandler<HitEvent>(OnHit);
     }
 
     public override void Tick()
     {
-        parent._velocity.y += parent.gravity * Time.deltaTime;
+        sm._character.SetFacing();
 
-        if (parent.IsPressingIntoLeftWall() || parent.IsPressingIntoRighttWall())
+        if (sm._character._velocity.y > sm._character.gravity_cutoff)
         {
-            parent._velocity.x = 0f;
+            sm._character._velocity.y += sm._character.gravity * Time.deltaTime;
+        }
+        else if(sm._character._velocity.y < sm._character.gravity_cutoff)
+        {
+
+        }
+
+        if (sm._character.IsPressingIntoLeftWall() || sm._character.IsPressingIntoRighttWall())
+        {
+            sm._character._velocity.x = 0f;
         }
         else
         {
-            if (Mathf.Abs(parent.normalized_directional_input.x) > .2f)
+            if (Mathf.Abs(sm._character.directionalInput.x) > .2f)
             {
-                parent._velocity.x += parent.normalized_directional_input.x * parent.horizontal_air_acceleration;
+                sm._character._velocity.x += sm._character.directionalInput.x * sm._character.horizontal_air_acceleration;
                 //parent._velocity.x = Mathf.Max(Mathf.Min(parent._velocity.x, parent.horizontal_speed_max), -parent.horizontal_speed_max);
-                if (parent._velocity.x > parent.horizontal_air_speed || parent._velocity.x < -parent.horizontal_air_speed)
+
+                if (sm._character._velocity.x > sm._character.horizontal_speed_max)
                 {
-                    parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                    sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, sm._character.horizontal_speed_max, sm._character.air_drag);
                 }
+
+                if (sm._character._velocity.x < -sm._character.horizontal_speed_max)
+                {
+                    sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, -sm._character.horizontal_speed_max, sm._character.air_drag);
+                }
+
             }
             else
             {
-                parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.air_drag);
+                sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0, sm._character.air_drag);
             }
         }
     }

@@ -20,33 +20,21 @@ public class HurtState : PlayerState{
     private Vector2 impulse_direction;
 
 
-    public HurtState(Player parent)
+    public HurtState(FSM parent)
     {
-        this.parent = parent;
-        OnStateEnter();
+        this.sm = parent;
     }
 
-    public HurtState(Player parent, CollisionBoxData properties, float launch_direction)
+    public HurtState(FSM parent, CollisionBoxData properties, float launch_direction)
     {
         eventManager = new EventManager();
-        this.parent = parent;
+        this.sm = parent;
         this.attack_damage = properties.attack_damage;
         this.knockback_growth = properties.knockback_growth;
-        this.victim_percent = (1f - parent.GetPercentStamina())*100f;
+        this.victim_percent = (1f - parent._character._stamina.GetPercentage())*100f;
         this.base_knockback = properties.base_knockback;
         this.launch_angle = properties.launch_angle;
         this.launch_direction = launch_direction;
-        OnStateEnter();
-    }
-
-    public HurtState(Player parent, float ad, float kg, float vp, float bk, float la)
-    {
-        this.parent = parent;
-        this.attack_damage = ad;
-        this.knockback_growth = kg;
-        this.victim_percent = vp;
-        this.base_knockback = bk;
-        this.launch_angle = la;
         OnStateEnter();
     }
 
@@ -55,7 +43,7 @@ public class HurtState : PlayerState{
     {
         if(stun_duration < 0)
         {
-            return new FallState(parent);
+            return new FallState(sm);
         }
         else
         {
@@ -66,34 +54,38 @@ public class HurtState : PlayerState{
 
     public override void OnStateEnter()
     {
+        //Handler Setup
         eventManager.AddHandler<CollisionEvent>(OnCollision);
         eventManager.AddHandler<WallInteractionEvent>(OnWallInteraction);
         eventManager.AddHandler<HitEvent>(OnHit);
+        
+        //Set Animation
+        sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Hurt) as XAnimation);
 
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Knockback_XAnimation") as XAnimation);
         launch_velocity = CalculateLaunchVelocity();
-        parent._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity * Mathf.Sign(launch_direction);
-        parent._velocity.y = Mathf.Sin(Mathf.Deg2Rad * launch_angle) * launch_velocity;
-        impulse_direction = parent._velocity.normalized;
-        parent.stamina -= CalculateDamage();
-        parent.stamina = Mathf.Max(parent.stamina, 0);
-        eventManager.Fire(new WallInteractionEvent(parent, parent.colliding_against));
+        sm._character._velocity.x = Mathf.Cos(Mathf.Deg2Rad * launch_angle) * launch_velocity * Mathf.Sign(launch_direction);
+        sm._character._velocity.y = Mathf.Sin(Mathf.Deg2Rad * launch_angle) * launch_velocity;
+        impulse_direction = sm._character._velocity.normalized;
+        eventManager.Fire(new WallInteractionEvent(sm._character, sm._character.colliding_against));
 
-        stun_duration = Mathf.FloorToInt(launch_velocity * .7f);
+        stun_duration = Mathf.FloorToInt(launch_velocity * .5f);
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+        eventManager.RemoveHandler<HitEvent>(OnHit);
+        eventManager.RemoveHandler<AnimationCompleteEvent>(OnAnimationComplete);
     }
 
     public override void Tick()
     {
-        parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0 ,Mathf.Cos(Mathf.Deg2Rad * launch_angle)*(15f * Time.deltaTime));
+        sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0 ,Mathf.Cos(Mathf.Deg2Rad * launch_angle)*(15f * Time.deltaTime));
         //parent._velocity.x = Mathf.Max(parent._velocity.x, 0);
         //parent._velocity.y -= Mathf.Sin(Mathf.Deg2Rad * launch_angle)*(launchResistance * Time.deltaTime);
-        parent.GravityTick();
+        sm._character.GravityTick();
         stun_duration--;
+
+        sm._character._velocity += sm._character.directionalInput * sm._character.influenceDrag;
     }
 
     void OnCollision(CollisionEvent e)
@@ -110,22 +102,40 @@ public class HurtState : PlayerState{
         //Debug.Log("First normal" + e.collision2D.contacts[0].normal);
         //Debug.Log("Average normal" + num);
         //Debug.Log("Pre Hit Vel: " + parent._velocity);
-        if((parent._velocity.sqrMagnitude > 1000))
+
+
+        if ((sm._character._velocity.sqrMagnitude > 1000))
         {
            
-            Vector2 reflection_dir = Vector3.Reflect(parent._velocity.normalized, e.collision2D.contacts[0].normal);      
-            parent._velocity = parent._velocity.magnitude * reflection_dir;
-            parent._velocity -= (parent._velocity * .2f);
+            Vector2 reflection_dir = Vector3.Reflect(sm._character._velocity.normalized, e.collision2D.contacts[0].normal);      
+            sm._character._velocity = sm._character._velocity.magnitude * reflection_dir;
+            sm._character._velocity -= (sm._character._velocity * .2f);
         }
+
+     
     }
 
     void OnWallInteraction(WallInteractionEvent e)
     {
+        Vector2 reflection_dir;
+        Debug.Log(sm._character._velocity.normalized);
+
+        if (e.wall == BaseCharacter.CollidedSurface.Ground)
+        {
+            if(sm._character._velocity.normalized.y <= -.7f)
+            {
+                sm._character._velocity.x *= .65f;
+            }
+            
+            
+           
+        }
+
         switch (e.wall) {
-            case Player.CollidedSurface.LeftWall :
-                Vector2 reflection_dir = Vector3.Reflect(parent._velocity.normalized, Vector3.right);
-                parent._velocity = parent._velocity.magnitude * reflection_dir;
-                parent._velocity -= (parent._velocity * .2f);
+            case BaseCharacter.CollidedSurface.LeftWall :
+                reflection_dir = Vector3.Reflect(sm._character._velocity.normalized, Vector3.right);
+                sm._character._velocity = sm._character._velocity.magnitude * reflection_dir;
+                sm._character._velocity -= (sm._character._velocity * .2f);
                 break;
 
             default:
@@ -134,11 +144,6 @@ public class HurtState : PlayerState{
 
     }
 
-    private float CalculateDamage()
-    {
-        Debug.Log("hit for: "+ attack_damage);
-        return attack_damage/4;
-    }
 
     private float CalculateLaunchVelocity()
     {
@@ -154,7 +159,7 @@ public class HurtState : PlayerState{
         //usually > 40
         */
 
-        return knockback_growth * (1.4f * ((attack_damage + 2) * (0 + Mathf.FloorToInt(victim_percent)) / 20) * (2 / (1 + weight_const)) + 18) + base_knockback;
+        return knockback_growth * (1.4f * ((attack_damage + 2) * (0 + Mathf.FloorToInt(victim_percent)) / 40) * (2 / (1 + weight_const)) + 18) + base_knockback;
     }
 
     

@@ -39,9 +39,10 @@ public class XAnimator : MonoBehaviour {
 
     //References 
     private SpriteRenderer frameRenderer;
-    private Player parent_player;
+    private BaseCharacter parent_player;
     GameObject hurtbox_group = null;
     GameObject hitbox_group = null;
+    GameObject gaurdbox_group = null;
 
     //Storage
     List<GameObject> CollisionBoxPool = new List<GameObject>();
@@ -58,14 +59,14 @@ public class XAnimator : MonoBehaviour {
     private void Start()
     {
         frameRenderer = GetComponent<SpriteRenderer>();
-        parent_player = GetComponent<Player>();
+        parent_player = GetComponent<BaseCharacter>();
         Init();
         //foreach group in xAnim create a child game object with the name of that group
     }
 
     private void Update()
     {
-        
+        facing = parent_player.GetFacing();
     }
 
     private void FixedUpdate()
@@ -112,6 +113,7 @@ public class XAnimator : MonoBehaviour {
     {
         hurtbox_group = null;
         hitbox_group = null;
+        gaurdbox_group = null;
 
         foreach (Transform child in transform)
         {
@@ -122,6 +124,10 @@ public class XAnimator : MonoBehaviour {
             if (child.name == "Hitbox")
             {
                 hitbox_group = child.gameObject;
+            }
+            if (child.name == "Gaurdbox")
+            {
+                gaurdbox_group = child.gameObject;
             }
         }
 
@@ -137,8 +143,14 @@ public class XAnimator : MonoBehaviour {
             hitbox_group.AddComponent<CollisionGroupManager>();
             hitbox_group.AddComponent<Rigidbody2D>().isKinematic = true;
         }
+        if (gaurdbox_group == null)
+        {
+            hitbox_group = Xeo.Utility.CreateChildObj("Gaurdbox", this.transform);
+            hitbox_group.AddComponent<CollisionGroupManager>();
+            hitbox_group.AddComponent<Rigidbody2D>().isKinematic = true;
+        }
 
-        
+
         //Cleanup last frame's boxes
         if (UsedCollisionBoxes.Count > 0)
         {
@@ -165,6 +177,15 @@ public class XAnimator : MonoBehaviour {
             for (int i = 0; i < active_keyframe.hitboxes.Count; i++)
             {
                 AddCollisionBox("Hitbox " + i, hitbox_group.transform, active_keyframe.hitboxes[i]);
+            }
+        }
+
+        if (active_keyframe.gaurdboxes.Count > 0)
+        {
+            gaurdbox_group.GetComponent<CollisionGroupManager>().SetData(parent_player, active_keyframe.gaurdboxes[0], facing);
+            for (int i = 0; i < active_keyframe.gaurdboxes.Count; i++)
+            {
+                AddCollisionBox("Gaurdbox " + i, gaurdbox_group.transform, active_keyframe.gaurdboxes[i]);
             }
         }
 
@@ -251,7 +272,7 @@ public class XAnimator : MonoBehaviour {
         switch (active_xAnim.loop)
         {
             case false:
-                parent_player.mState.FireCustomEvent(new EventList.AnimationCompleteEvent(this));
+                parent_player._sm.currentState.FireCustomEvent(new EventList.AnimationCompleteEvent(this));
                 break;
 
             default:
@@ -292,7 +313,7 @@ public class XAnimator : MonoBehaviour {
 
     public int GetAnimationLengthFrames()
     {
-        return active_xAnim.GetTotalFrameLength();
+        return active_xAnim.GetTotalAnimationTime();
     }
 
 

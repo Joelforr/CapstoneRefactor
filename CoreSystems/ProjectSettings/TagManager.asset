@@ -17,9 +17,9 @@ TagManager:
   - Physx
   - Hurt
   - Hit
-  - 
-  - 
-  - 
+  - Gaurd
+  - Bounds
+  - Character
   - 
   - 
   - 

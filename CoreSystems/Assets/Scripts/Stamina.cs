@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Stamina : MonoBehaviour {
+public class Stamina {
 
-    float base_value;
+    public float base_value;
+
 
     float current;
     public float Current
     {
         get { return current; }
         set { current = value;
-            current = Mathf.Clamp(current, 0, current_max); }
+            current = Mathf.Clamp(current, 1, current_max); }
     }
 
     float current_max;
@@ -31,17 +32,16 @@ public class Stamina : MonoBehaviour {
     }
 
 
-    float regen_rate;
+    public float regen_rate;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public Stamina(float base_v, float regen_v)
+    {
+        base_value = base_v;
+        current_max = base_v;
+        current = base_v;
+        regen_rate = regen_v;
+    }
+
 
     public float GetPercentage()
     {
@@ -49,10 +49,9 @@ public class Stamina : MonoBehaviour {
         return current / current_max;
     }
 
-    public void Siphon(Stamina other, float value)
+    public float GetBasePercentageChange()
     {
-        Max += value;
-        other.Max -= value;
+        return (Max - base_value) / base_value;
     }
 
     public void Regenerate(float multiplier = 1.0f)
@@ -60,7 +59,31 @@ public class Stamina : MonoBehaviour {
         Current += (regen_rate * multiplier);
     }
 
+    public void Reset()
+    {
+        Max = base_value;
+        Current = Max;
+    }
 
+    public void Siphon(Stamina other, float value)
+    {
+        other.Current -= value;
 
+        if (other.Max >= value / 2)
+        {
+            Max += value / 2;
+            other.Max -= value / 2;
+        }
+    }
+
+    public void Siphon(BaseCharacter other, float value)
+    {
+        other._stamina.Current -= value;
+        if (other._stamina.Max >= value / 2)
+        {
+            Max += value / 2;
+            other._stamina.Max -= value / 2;
+        }
+    }
   
 }

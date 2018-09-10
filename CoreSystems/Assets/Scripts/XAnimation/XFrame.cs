@@ -9,6 +9,7 @@ public class XFrame : ScriptableObject
 
     public List<CollisionBoxData> hitboxes;
     public List<CollisionBoxData> hurtboxes;
+    public List<CollisionBoxData> gaurdboxes;
 }
 
 public class Group
@@ -37,6 +38,7 @@ public class CollisionBoxData
     {
         Hit,
         Hurt,
+        Gaurd,
         Physx
     }
 

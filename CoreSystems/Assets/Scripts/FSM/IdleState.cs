@@ -6,43 +6,31 @@ using EventList;
 
 public class IdleState : PlayerState {
 
-    public IdleState(Player parent)
+    public IdleState(FSM parent)
     {
-        this.parent = parent;
-        OnStateEnter();
+        this.sm = parent;
     }
 
     public override PlayerState HandleTransitions()
     {
-        if(!parent.HasFlag(Player.CollidedSurface.Ground)){
-            return new FallState(parent);
+        if(!sm._character.HasFlag(BaseCharacter.CollidedSurface.Ground)){
+            return new FallState(sm);
         }
-        else if (parent._inputManager.controller.x != 0 && parent.HasFlag(Player.CollidedSurface.Ground))
+        else if (sm._character.directionalInput.x != 0 && sm._character.IsGrounded())
         {
-            //OnStateExit();
-            return new WalkState(parent);
+            return new RunState(sm);
         }
-        else if (Input.GetButtonDown(parent._inputManager.jump))
+        else if (sm._character.player.GetButtonDown(4))
         {
-            if (parent.stamina >= 15)
-            {
-                return new JumpState(parent);
-            }
-            else
-            {
-                return this;
-            }
+            return new JumpState(sm);
         }
-        else if (Input.GetButtonDown(parent._inputManager.fire))
+        else if (sm._character.player.GetButtonDown(2) && sm.attackGraceFrames <= 0)
         {
-            if (parent.stamina >= 10)
-            {
-                return new AttackState(parent, AttackState.AttackType.Ground);
-            }
-            else
-            {
-                return this;
-            }
+            return new AttackState(sm);
+        }
+        else if (sm._character.player.GetButtonDown(3) && sm.dodgeGraceFrames <= 0)
+        {
+            return new DodgeState(sm);
         }
         else
         {
@@ -52,22 +40,28 @@ public class IdleState : PlayerState {
 
     public override void OnStateEnter()
     {
+        //Handler Setup
         eventManager.AddHandler<HitEvent>(OnHit);
 
-        parent._xAnimator.SetAnimation(Resources.Load("Data/XAnimationData/Idle_XAnimation") as XAnimation);
+        //Set Animation
+        sm._character._xAnimator.SetAnimation(Services.AnimationLibray.GetXAnimation(sm.c, AnimationLibrary.AnimationTags.Idle) as XAnimation);
+
+        sm.jumpCount = 0;
         //if (parent._velocity != Vector2.zero) parent._velocity = Vector2.zero;
-        
+        sm._character._velocity.y = 0;
     }
 
     public override void OnStateExit()
     {
-        throw new System.NotImplementedException();
+        eventManager.RemoveHandler<HitEvent>(OnHit);
     }
 
     public override void Tick()
     {
-        parent.RegenStamina();
-        parent._velocity.x = parent._velocity.normalized.x * Mathf.MoveTowards(parent._velocity.magnitude, 0, parent.horizontal_drag/3);
-        parent._velocity.y = 0;
+        sm._character.SetFacing();
+        sm._character._stamina.Regenerate();
+        sm._character.staminaSystem.RegenTimerTick();
+        sm._character._velocity.x = sm._character._velocity.normalized.x * Mathf.MoveTowards(sm._character._velocity.magnitude, 0, sm._character.horizontal_drag /3);
+        sm._character._velocity.y = 0;
     }
 }

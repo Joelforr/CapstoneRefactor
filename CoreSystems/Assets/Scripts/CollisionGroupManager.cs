@@ -5,7 +5,7 @@ using UnityEngine;
 public class CollisionGroupManager : MonoBehaviour {
 
     //References
-    private Player owner;
+    private BaseCharacter owner;
 
     //State
     private CollisionBoxData.BoxType groupType;
@@ -40,7 +40,7 @@ public class CollisionGroupManager : MonoBehaviour {
     {
         try{
             CollisionBox cb = collision.GetComponent<CollisionBox>();
-            if(cb.owner != owner && collision.GetComponentInParent<Player>() != null)
+            if(cb.owner != owner && collision.GetComponentInParent<BaseCharacter>() != null)
             {
                 if (collision.gameObject.layer == LayerMask.NameToLayer("Hurt") && collided == false)
                 {
@@ -50,15 +50,26 @@ public class CollisionGroupManager : MonoBehaviour {
                         del = () =>
                         {
                             Debug.Log(this.name + " collided with: " + collision.name);
-                            Player player_hit = collision.gameObject.GetComponentInParent<Player>();
-                            player_hit.mState.FireCustomEvent(new EventList.HitEvent(player_hit, properties, launch_direction));
+                            BaseCharacter player_hit = collision.gameObject.GetComponentInParent<BaseCharacter>();
+                            player_hit._sm.currentState.FireCustomEvent(new EventList.HitEvent(player_hit, properties, launch_direction));
+                            owner._stamina.Siphon(player_hit, CalculateDamage());
+
+                            player_hit.sfxPlayer.Play(Services.SFXLibrary.GetSFX(SFXLibrary.SFXTags.Impact));
+                            Camera.main.GetComponent<Cam>().ShakeCamera(.65f, 15);
+                            if (player_hit.staminaSystem.GetCurrentMaxStamina() > 2)
+                            {
+                                owner.staminaSystem.Add();
+                                player_hit.staminaSystem.Remove();
+                            }
+                            else
+                            {
+                                player_hit.staminaSystem.SpendOrbs(1);
+                            }
                         };
                     }
                     del();
                 }
             }
-
-           
         }
         catch
         {
@@ -77,7 +88,7 @@ public class CollisionGroupManager : MonoBehaviour {
     /// </summary>
     /// <param name="collisionBox_data"></param>
     /// <param name="launch_direction"></param>
-    public void SetData(Player owner, CollisionBoxData collisionBox_data, float launch_direction)
+    public void SetData(BaseCharacter owner, CollisionBoxData collisionBox_data, float launch_direction)
     {
         this.owner = owner;
         this.properties = collisionBox_data;
@@ -92,5 +103,10 @@ public class CollisionGroupManager : MonoBehaviour {
     public void Clear()
     {
 
+    }
+
+    private float CalculateDamage()
+    {
+        return this.attack_damage * 2;
     }
 }
