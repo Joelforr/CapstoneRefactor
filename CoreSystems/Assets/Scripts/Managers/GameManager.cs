@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
     public BaseCharacter p2;
 
     private MatchManager mm;
+    public MapPicker mapPicker;
 
     public GameObject medal_UI_Prefab;
     public GameObject p1_medal_text;

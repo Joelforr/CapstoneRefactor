@@ -41,6 +41,12 @@ namespace Rewired {
             editorPlatform = EditorPlatform.OSX;
 #endif
 
+#if UNITY_EDITOR && REWIRED_DEBUG_MOCK_BUILD_PLAYER
+        Debug.LogWarning("Rewired is mocking the build player in the editor");
+        isEditor = false;
+        editorPlatform = EditorPlatform.None;
+#endif
+
 #if UNITY_STANDALONE_OSX
             platform = Platform.OSX;
 #endif

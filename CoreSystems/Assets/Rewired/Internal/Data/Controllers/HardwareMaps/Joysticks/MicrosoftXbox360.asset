@@ -173,6 +173,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts: []
       productName_useRegex: 1
       productName:
       - .*x[\-]*box[ ]*360.*
@@ -724,6 +725,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 0
+      alternateElementCounts: []
       productName_useRegex: 0
       productName: []
       productGUID: []
@@ -990,6 +992,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 0
+      alternateElementCounts: []
       productName_useRegex: 1
       productName:
       - Controller
@@ -1424,6 +1427,10 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts:
+      - axisCount: 6
+        buttonCount: 15
+        hatCount: 1
       manufacturer_useRegex: 0
       productName_useRegex: 1
       systemName_useRegex: 1
@@ -1959,6 +1966,7 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 0
+        alternateElementCounts: []
         manufacturer_useRegex: 0
         productName_useRegex: 1
         systemName_useRegex: 0
@@ -2496,6 +2504,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 0
+      alternateElementCounts: []
       manufacturer_useRegex: 0
       productName_useRegex: 0
       manufacturer: []
@@ -2858,6 +2867,7 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 1
+        alternateElementCounts: []
         manufacturer_useRegex: 0
         productName_useRegex: 1
         manufacturer: []

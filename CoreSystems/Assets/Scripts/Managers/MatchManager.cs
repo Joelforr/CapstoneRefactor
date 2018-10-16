@@ -23,6 +23,8 @@ public class MatchManager {
 
     public GameObject countdown;
 
+    public MapPicker mapPicker;
+
     private bool ignoreCalls = false;
  
     public MatchManager(GameManager gm, int goal, GameObject medalPrefab, GameObject p1_medaltext, GameObject p2_medaltext, GameObject scoreboard, GameObject countdownText)
@@ -33,6 +35,8 @@ public class MatchManager {
         this.goal = goal;
         this.scoreboard = scoreboard;
         this.countdown = countdownText;
+
+        this.mapPicker = gm.mapPicker;
 
         p1_medals = new Image[goal];
         p2_medals = new Image[goal];
@@ -121,9 +125,10 @@ public class MatchManager {
             scoreboard.SetActive(false);
         }
 
-        //Step 4 Reset Players
-        p1.Reset(GameManager.instance.p1_spawnpoint);
-        p2.Reset(GameManager.instance.p2_spawnpoint);
+        //Step 4 Reset Map and PLayers Players
+        Map newMap = mapPicker.SelectMap();
+        p1.Reset(newMap.spawnA);
+        p2.Reset(newMap.spawnB);
 
         //Step 5 Start New Round
         countdown.SetActive(true);
