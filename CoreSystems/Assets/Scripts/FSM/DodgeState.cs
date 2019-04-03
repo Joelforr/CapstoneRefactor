@@ -47,6 +47,9 @@ public class DodgeState : PlayerState {
 
         duration = sm._character._xAnimator.GetAnimationLengthFrames();
         dashingFrames = (int)duration - 1;
+
+        //add bonus to distance if character was running
+        distance += character._velocity.x * 2 * Time.deltaTime;
     }
 
     public override void OnStateExit()
@@ -69,6 +72,9 @@ public class DodgeState : PlayerState {
     private float GetDashSpeed()
     {
         float normalizedTime = (float)((duration) - dashingFrames) / (duration);
+
+   
+
 
         float speed = EaseOutQuadD(0, distance, normalizedTime) / duration / Time.fixedDeltaTime * character.GetFacing();
 
