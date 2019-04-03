@@ -38088,7 +38088,7 @@ MonoBehaviour:
   influenceDrag: 0.5
   motorLevel: 0
   motorIndex: 0
-  color: 1
+  color: 2
   status: 0
   _collisionMask:
     serializedVersion: 2

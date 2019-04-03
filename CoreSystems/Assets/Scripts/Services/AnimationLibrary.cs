@@ -10,6 +10,7 @@ public class AnimationLibrary
     {
         _Gry,
         _Purp,
+        _TestC1,
     }
 
     public enum AnimationTags
@@ -85,11 +86,32 @@ public class AnimationLibrary
         purp.Add(AnimationTags.Run, Resources.Load("Data/XAnimationData/_Purp/Run") as XAnimation);
         #endregion
 
+        #region Test Character 1
+        Dictionary<AnimationTags, XAnimation> testc1 = new Dictionary<AnimationTags, XAnimation>();
+        testc1.Add(AnimationTags.Attack_D_A, Resources.Load("Data/XAnimationData/_TestC1/Attack_Down_A") as XAnimation);
+        testc1.Add(AnimationTags.Attack_D_G, Resources.Load("Data/XAnimationData/_TestC1/Attack_Down_G") as XAnimation);
+        testc1.Add(AnimationTags.Attack_S_A, Resources.Load("Data/XAnimationData/_TestC1/Attack_Side_A") as XAnimation);
+        testc1.Add(AnimationTags.Attack_S_G, Resources.Load("Data/XAnimationData/_TestC1/Attack_Side_G") as XAnimation);
+        testc1.Add(AnimationTags.Attack_Sl, Resources.Load("Data/XAnimationData/_TestC1/Attack_Slide") as XAnimation);
+        testc1.Add(AnimationTags.Attack_U_A, Resources.Load("Data/XAnimationData/_TestC1/Attack_Up_A") as XAnimation);
+        testc1.Add(AnimationTags.Attack_U_G, Resources.Load("Data/XAnimationData/_TestC1/Attack_Up_G") as XAnimation);
+
+        testc1.Add(AnimationTags.Dodge, Resources.Load("Data/XAnimationData/_TestC1/Dodge") as XAnimation);
+        testc1.Add(AnimationTags.Fall, Resources.Load("Data/XAnimationData/_TestC1/Fall") as XAnimation);
+        //testc1.Add(AnimationTags.Gaurd, Resources.Load("Data/XAnimationData/_TestC1/Gaurd") as XAnimation);
+        testc1.Add(AnimationTags.Hurt, Resources.Load("Data/XAnimationData/_TestC1/Hurt") as XAnimation);
+
+        testc1.Add(AnimationTags.Idle, Resources.Load("Data/XAnimationData/_TestC1/Idle") as XAnimation);
+        testc1.Add(AnimationTags.Jump, Resources.Load("Data/XAnimationData/_TestC1/Jump") as XAnimation);
+        testc1.Add(AnimationTags.Run, Resources.Load("Data/XAnimationData/_TestC1/Run") as XAnimation);
+        #endregion
+
 
 
         //CHARACTER DICTIONARY POPULATION
         character_dictionary.Add(CharacterTags._Gry, gry);
         character_dictionary.Add(CharacterTags._Purp, purp);
+        character_dictionary.Add(CharacterTags._TestC1, testc1);
 
     }
 

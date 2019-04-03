@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87a447074dc09a4aa27d34b81d717b8, type: 3}
+  m_Name: Attack_Side_A
+  m_EditorClassIdentifier: 
+  fps: 60
+  loop: 0
+  exitOnComplete: 0
+  frames:
+  - {fileID: 11400000, guid: 04f18ce46bd69b343a4d14245176c152, type: 2}
+  - {fileID: 11400000, guid: 7db725c591db26348b6de0ef6d5e6c58, type: 2}
+  - {fileID: 11400000, guid: e865d197c3f2e524fbb171e18dba26fb, type: 2}
+  - {fileID: 11400000, guid: 0d8b9b6007b7abe4895229c324d37578, type: 2}
+  - {fileID: 11400000, guid: a707656083b333d45af0226857d919a4, type: 2}
